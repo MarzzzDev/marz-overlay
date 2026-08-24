@@ -93,12 +93,6 @@ let twemojiReady = null;
 
 
 function getOAuthRedirectUri() {
-    /*
-     * This automatically uses the page currently running the overlay.
-     *
-     * Example:
-     * https://username.github.io/overlay/
-     */
     return window.location.origin + window.location.pathname;
 }
 
@@ -212,9 +206,6 @@ function readOAuthTokenFromHash() {
         return null;
     }
 
-    /*
-     * Remove the OAuth token from the visible URL.
-     */
     window.history.replaceState(
         {},
         document.title,
@@ -2010,10 +2001,6 @@ async function loadTwitchBadges() {
             "Authorization":
                 `Bearer ${accessToken}`
         };
-
-        /*
-         * Load global Twitch badges
-         */
         const globalResponse =
             await fetch(
                 "https://api.twitch.tv/helix/chat/badges/global",
@@ -2035,10 +2022,6 @@ async function loadTwitchBadges() {
             globalData.data || []
         );
 
-
-        /*
-         * Find the broadcaster's Twitch user ID.
-         */
         const userResponse =
             await fetch(
                 `https://api.twitch.tv/helix/users?login=${encodeURIComponent(
@@ -2062,9 +2045,6 @@ async function loadTwitchBadges() {
             userData.data?.[0]?.id;
 
 
-        /*
-         * Load channel-specific badges.
-         */
         if (broadcasterId) {
             const channelResponse =
                 await fetch(
@@ -4979,12 +4959,6 @@ function addGlobalStyle() {
     );
 }
 
-/*
- * ============================================================
- * Twitch EventSub WebSocket
- * ============================================================
- */
-
 function createEventSubSocket(url = null) {
     const socketUrl =
         url ||
@@ -5051,10 +5025,6 @@ function createEventSubSocket(url = null) {
             eventSubSessionId =
                 null;
 
-            /*
-             * Do not reconnect immediately if Twitch
-             * supplied a dedicated reconnect URL.
-             */
             if (
                 eventSubReconnectUrl
             ) {
@@ -5081,9 +5051,6 @@ function createEventSubSocket(url = null) {
                 return;
             }
 
-            /*
-             * Normal unexpected disconnect.
-             */
             clearTimeout(
                 eventSubReconnectTimer
             );
@@ -5114,12 +5081,6 @@ async function handleEventSubMessage(data) {
         return;
     }
 
-
-    /*
-     * Twitch sends this immediately after
-     * connecting. It contains the session ID
-     * required when creating subscriptions.
-     */
     if (
         messageType ===
         "session_welcome"
@@ -5148,11 +5109,6 @@ async function handleEventSubMessage(data) {
         return;
     }
 
-
-    /*
-     * Twitch can tell us to reconnect to another
-     * EventSub WebSocket URL.
-     */
     if (
         messageType ===
         "session_reconnect"
@@ -5173,10 +5129,6 @@ async function handleEventSubMessage(data) {
         return;
     }
 
-
-    /*
-     * Keepalive messages don't need any action.
-     */
     if (
         messageType ===
         "session_keepalive"
@@ -5184,10 +5136,6 @@ async function handleEventSubMessage(data) {
         return;
     }
 
-
-    /*
-     * Actual chat notification.
-     */
     if (
         messageType ===
         "notification"
@@ -5303,10 +5251,7 @@ async function subscribeToChat() {
                     responseText
                 );
         } catch {
-            /*
-             * Twitch should return JSON, but don't
-             * let an unexpected response crash chat.
-             */
+  
         }
 
 
@@ -5323,12 +5268,6 @@ async function subscribeToChat() {
     }
 }
 
-
-/*
- * Convert Twitch EventSub chat data into the
- * same general structure that your existing
- * onMsg() renderer already understands.
- */
 function handleEventSubChatMessage(event) {
     if (!event) {
         return;
@@ -5356,14 +5295,6 @@ function handleEventSubChatMessage(event) {
         event.message?.text ||
         "";
 
-
-    /*
-     * EventSub gives us structured fragments.
-     *
-     * We create Twitch-style emote ranges so
-     * your existing renderMessageText() can
-     * continue working.
-     */
     const emoteRanges =
         convertEventSubEmotes(
             event.message?.fragments,
@@ -5395,18 +5326,10 @@ function handleEventSubChatMessage(event) {
         "is-action":
             event.message_type ===
             "action",
-
-        /*
-         * EventSub exposes the reward ID directly.
-         * Your existing onMsg() already checks this.
-         */
         "custom-reward-id":
             event.channel_points_custom_reward_id ||
             "",
 
-        /*
-         * Reply information.
-         */
         "reply-parent-msg-id":
             event.reply?.parent_message_id ||
             "",
@@ -5571,14 +5494,6 @@ function convertEventSubEmotes(
         return "";
     }
 
-
-    /*
-     * Twitch IRC's emote format:
-     *
-     * id:start-end,start-end/id:start-end
-     *
-     * Your existing parser understands this.
-     */
     const grouped =
         new Map();
 
@@ -5618,19 +5533,9 @@ function convertEventSubEmotes(
 
 addGlobalStyle();
 
-/*
- * ============================================================
- * Startup
- * ============================================================
- */
-
 async function startOverlay() {
     addGlobalStyle();
 
-
-    /*
-     * Authenticate Twitch first.
-     */
     const authenticated =
         await ensureTwitchAuth();
 
@@ -5645,11 +5550,6 @@ async function startOverlay() {
 
 
     hideTwitchLoginScreen();
-
-
-    /*
-     * Load all existing emote/badge data.
-     */
     Promise.allSettled([
         load7TVGlobalEmotes(),
         load7TVEmotes(),
@@ -5675,19 +5575,8 @@ async function startOverlay() {
             );
         });
 
-
-    /*
-     * Start EventSub after authentication.
-     */
     createEventSubSocket();
 
-
-    /*
-     * Validate the token periodically.
-     *
-     * This prevents a revoked/expired token from
-     * silently leaving the overlay disconnected.
-     */
     setInterval(
         async () => {
             if (!accessToken) {
