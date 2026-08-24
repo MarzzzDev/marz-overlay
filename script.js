@@ -2100,17 +2100,14 @@ async function loadTwitchBadges() {
 }
 
 function addTwitchBadges(badgeSets) {
-    for (const set of badgeSets) {
-        if (!set || !set.set_id) {
+    for (const set of badgeSets || []) {
+        if (!set?.set_id) {
             continue;
         }
 
-        const setId =
-            set.set_id;
+        const setId = set.set_id;
 
-        for (const version of (
-            set.versions || []
-        )) {
+        for (const version of set.versions || []) {
             if (!version?.id) {
                 continue;
             }
@@ -2118,27 +2115,23 @@ function addTwitchBadges(badgeSets) {
             const key =
                 `${setId}/${version.id}`;
 
-            twitchBadges.set(
-                key,
-                {
-                    title:
-                        set.title ||
-                        setId,
+            twitchBadges.set(key, {
+                title:
+                    set.title ||
+                    setId,
 
-                    url_1x:
-                        version.image_url_1x,
+                url_1x:
+                    version.image_url_1x || "",
 
-                    url_2x:
-                        version.image_url_2x,
+                url_2x:
+                    version.image_url_2x || "",
 
-                    url_3x:
-                        version.image_url_3x
-                }
-            );
+                url_3x:
+                    version.image_url_3x || ""
+            });
         }
     }
 }
-
 function normalizeFFZRoomBadge(
     badge,
     title
@@ -2523,12 +2516,10 @@ function createTwitchBadges(tags) {
         return container;
     }
 
-    const entries =
-        badgeString
-            .split(",")
-            .filter(Boolean);
+    for (const entry of badgeString
+        .split(",")
+        .filter(Boolean)) {
 
-    for (const entry of entries) {
         const slash =
             entry.indexOf("/");
 
@@ -2550,22 +2541,12 @@ function createTwitchBadges(tags) {
 
         if (!badge) {
             console.warn(
-                "Twitch badge not found:",
+                "Twitch badge data not found:",
                 key
             );
-
             continue;
         }
 
-        /*
-         * Twitch returns:
-         *
-         * url_1x
-         * url_2x
-         * url_3x
-         *
-         * Use the 2x version for the overlay.
-         */
         const badgeUrl =
             badge.url_2x ||
             badge.url_1x ||
@@ -2574,14 +2555,17 @@ function createTwitchBadges(tags) {
         if (!badgeUrl) {
             console.warn(
                 "Twitch badge has no image URL:",
+                key,
                 badge
             );
-
             continue;
         }
 
         const img =
             document.createElement("img");
+
+        img.className =
+            "badge";
 
         img.src =
             badgeUrl;
@@ -2594,17 +2578,8 @@ function createTwitchBadges(tags) {
             badge.title ||
             set;
 
-        img.className =
-            "badge";
-
-        img.dataset.badgeType =
-            set;
-
-        img.width =
-            18;
-
-        img.height =
-            18;
+        img.width = 18;
+        img.height = 18;
 
         img.style.width =
             "18px";
@@ -2615,21 +2590,15 @@ function createTwitchBadges(tags) {
         img.style.objectFit =
             "contain";
 
-        /*
-         * If Twitch's URL fails, log the actual URL
-         * so we can see exactly what is happening.
-         */
-        img.onerror =
-            function() {
-                console.error(
-                    "Failed to load Twitch badge:",
-                    {
-                        key,
-                        url: badgeUrl,
-                        badge
-                    }
-                );
-            };
+        img.onerror = () => {
+            console.error(
+                "Failed to load Twitch badge:",
+                {
+                    key,
+                    url: badgeUrl
+                }
+            );
+        };
 
         container.appendChild(img);
     }
