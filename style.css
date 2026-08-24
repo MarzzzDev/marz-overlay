@@ -76,7 +76,7 @@ body {
     line-height: 30px;
     border-radius: 14px;
 
-    /*background: linear-gradient(
+    background: linear-gradient(
         90deg,
         rgba(45, 12, 18, 0.9),
         rgba(65, 18, 25, 0.75)
@@ -86,7 +86,7 @@ body {
 
     box-shadow:
         0 4px 14px rgba(0, 0, 0, 0.45),
-        inset 0 0 18px rgba(255, 50, 50, 0.06);*/
+        inset 0 0 18px rgba(255, 50, 50, 0.06);
 
     animation: messageIn 0.25s ease-out forwards;
 
