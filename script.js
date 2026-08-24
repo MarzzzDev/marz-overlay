@@ -2481,10 +2481,12 @@ function createTwitchBadges(tags) {
         return container;
     }
 
-    for (const entry of badgeString
-        .split(",")
-        .filter(Boolean)) {
-
+    for (
+        const entry
+        of badgeString
+            .split(",")
+            .filter(Boolean)
+    ) {
         const slash =
             entry.indexOf("/");
 
@@ -2493,15 +2495,20 @@ function createTwitchBadges(tags) {
         }
 
         const set =
-            entry.substring(0, slash);
+            entry.substring(
+                0,
+                slash
+            );
 
         const version =
-            entry.substring(slash + 1);
+            entry.substring(
+                slash + 1
+            );
 
-        // PUT IT HERE
-        const badge = twitchBadges.get(
-            `${set}/${version}`
-        );
+        const badge =
+            twitchBadges.get(
+                `${set}/${version}`
+            );
 
         const badgeUrl =
             badge?.url_2x ||
@@ -2513,6 +2520,7 @@ function createTwitchBadges(tags) {
                 "Twitch badge not found:",
                 `${set}/${version}`
             );
+
             continue;
         }
 
@@ -2536,15 +2544,29 @@ function createTwitchBadges(tags) {
         img.width = 18;
         img.height = 18;
 
-        img.style.width = "18px";
-        img.style.height = "18px";
-        img.style.objectFit = "contain";
+        img.style.width =
+            "18px";
 
-        container.appendChild(img);
+        img.style.height =
+            "18px";
+
+        img.style.objectFit =
+            "contain";
+
+        img.dataset.badgeType =
+            set;
+
+        img.dataset.badgeProvider =
+            "twitch";
+
+        container.appendChild(
+            img
+        );
     }
 
     return container;
 }
+
 
 function createFFZRoomBadge(tags) {
     const badgeString =
@@ -2641,6 +2663,368 @@ function createFFZRoomBadge(tags) {
 
     return null;
 }
+
+
+function hasTwitchBadge(
+    tags,
+    badgeType
+) {
+    if (!tags) {
+        return false;
+    }
+
+    const badgeString =
+        tags.badges || "";
+
+    if (!badgeString) {
+        return false;
+    }
+
+    return badgeString
+        .split(",")
+        .filter(Boolean)
+        .some(entry => {
+            const slash =
+                entry.indexOf("/");
+
+            const type =
+                slash === -1
+                    ? entry
+                    : entry.substring(
+                        0,
+                        slash
+                    );
+
+            return type === badgeType;
+        });
+}
+
+
+function isFFZVipBadge(
+    id,
+    badge
+) {
+    const badgeId =
+        String(id || "")
+            .toLowerCase();
+
+    const badgeName =
+        String(
+            badge?.name || ""
+        )
+            .toLowerCase();
+
+    const badgeTitle =
+        String(
+            badge?.title || ""
+        )
+            .toLowerCase();
+
+
+    return (
+        badgeId === "vip" ||
+        badgeName === "vip" ||
+        badgeTitle === "vip" ||
+        badgeTitle.includes("vip")
+    );
+}
+
+
+async function createExternalBadges(
+    userId,
+    tags = null
+) {
+    const container =
+        document.createElement("span");
+
+    container.className =
+        "badges external-badges";
+
+    if (!userId) {
+        return container;
+    }
+
+    userId =
+        String(userId);
+
+    if (
+        externalBadgeCache.has(
+            userId
+        )
+    ) {
+        const cached =
+            externalBadgeCache.get(
+                userId
+            );
+
+        for (
+            const badge
+            of cached
+        ) {
+            if (
+                badge.provider === "FFZ" &&
+                badge.type === "vip" &&
+                ffzRoomBadges.vip &&
+                hasTwitchBadge(
+                    tags,
+                    "vip"
+                )
+            ) {
+                continue;
+            }
+
+            const img =
+                createBadge(
+                    badge.url,
+                    badge.title
+                );
+
+            if (img) {
+                container.appendChild(
+                    img
+                );
+            }
+        }
+
+        return container;
+    }
+
+    if (
+        externalBadgePromises.has(
+            userId
+        )
+    ) {
+        const badges =
+            await externalBadgePromises.get(
+                userId
+            );
+
+        for (
+            const badge
+            of badges
+        ) {
+            if (
+                badge.provider === "FFZ" &&
+                badge.type === "vip" &&
+                ffzRoomBadges.vip &&
+                hasTwitchBadge(
+                    tags,
+                    "vip"
+                )
+            ) {
+                continue;
+            }
+
+            const img =
+                createBadge(
+                    badge.url,
+                    badge.title
+                );
+
+            if (img) {
+                container.appendChild(
+                    img
+                );
+            }
+        }
+
+        return container;
+    }
+
+
+    const promise =
+        (async () => {
+            const badges = [];
+            const ffzUser =
+                await getFFZUser(
+                    userId
+                );
+
+            if (ffzUser) {
+                const ffzUserBadges =
+                    ffzUser.badges || {};
+
+                for (
+                    const [
+                        id,
+                        badge
+                    ]
+                    of Object.entries(
+                        ffzUserBadges
+                    )
+                ) {
+
+                    if (
+                        ffzRoomBadges.vip &&
+                        hasTwitchBadge(
+                            tags,
+                            "vip"
+                        ) &&
+                        isFFZVipBadge(
+                            id,
+                            badge
+                        )
+                    ) {
+                        continue;
+                    }
+
+
+                    const url =
+                        badge?.urls?.["4"] ||
+                        badge?.urls?.["2"] ||
+                        badge?.urls?.["1"] ||
+                        badge?.image;
+
+                    if (!url) {
+                        continue;
+                    }
+
+                    const normalizedUrl =
+                        normalizeImageUrl(
+                            url
+                        );
+
+                    if (!normalizedUrl) {
+                        continue;
+                    }
+
+                    badges.push({
+                        url:
+                            normalizedUrl,
+
+                        title:
+                            badge?.title ||
+                            badge?.name ||
+                            `FFZ ${id}`,
+
+                        provider:
+                            "FFZ",
+
+                        type:
+                            isFFZVipBadge(
+                                id,
+                                badge
+                            )
+                                ? "vip"
+                                : null
+                    });
+
+                    preloadBadgeImage(
+                        normalizedUrl
+                    );
+                }
+            }
+
+            const sevenTV =
+                await load7TVUserBadges(
+                    userId
+                );
+
+            for (
+                const badge
+                of sevenTV
+            ) {
+                let url =
+                    badge.loadedUrl ||
+                    null;
+
+                if (!url) {
+                    for (
+                        const candidate
+                        of badge.urls || []
+                    ) {
+                        const image =
+                            await preloadBadgeImage(
+                                candidate
+                            );
+
+                        if (image) {
+                            url =
+                                candidate;
+
+                            break;
+                        }
+                    }
+                }
+
+                if (!url) {
+                    continue;
+                }
+
+                badges.push({
+                    url,
+
+                    title:
+                        badge.name ||
+                        "7TV",
+
+                    provider:
+                        "7TV",
+
+                    type:
+                        null
+                });
+            }
+
+
+            return badges;
+        })();
+
+
+    externalBadgePromises.set(
+        userId,
+        promise
+    );
+
+
+    try {
+        const badges =
+            await promise;
+
+        externalBadgeCache.set(
+            userId,
+            badges
+        );
+
+
+        for (
+            const badge
+            of badges
+        ) {
+            if (
+                badge.provider === "FFZ" &&
+                badge.type === "vip" &&
+                ffzRoomBadges.vip &&
+                hasTwitchBadge(
+                    tags,
+                    "vip"
+                )
+            ) {
+                continue;
+            }
+
+            const img =
+                createBadge(
+                    badge.url,
+                    badge.title
+                );
+
+            if (img) {
+                container.appendChild(
+                    img
+                );
+            }
+        }
+
+        return container;
+
+    } finally {
+        externalBadgePromises.delete(
+            userId
+        );
+    }
+}
+
 
 async function load7TVUserBadges(userId) {
     if (!userId) {
@@ -2823,226 +3207,6 @@ async function getFFZUser(userId) {
     }
 }
 
-async function createExternalBadges(
-    userId
-) {
-    const container =
-        document.createElement("span");
-
-    container.className =
-        "badges external-badges";
-
-    if (!userId) {
-        return container;
-    }
-
-    userId =
-        String(userId);
-
-    if (
-        externalBadgeCache.has(
-            userId
-        )
-    ) {
-        const cached =
-            externalBadgeCache.get(
-                userId
-            );
-
-        for (
-            const badge
-            of cached
-        ) {
-            const img =
-                createBadge(
-                    badge.url,
-                    badge.title
-                );
-
-            if (img) {
-                container.appendChild(
-                    img
-                );
-            }
-        }
-
-        return container;
-    }
-
-    if (
-        externalBadgePromises.has(
-            userId
-        )
-    ) {
-        const badges =
-            await externalBadgePromises.get(
-                userId
-            );
-
-        for (
-            const badge
-            of badges
-        ) {
-            const img =
-                createBadge(
-                    badge.url,
-                    badge.title
-                );
-
-            if (img) {
-                container.appendChild(
-                    img
-                );
-            }
-        }
-
-        return container;
-    }
-
-    const promise =
-        (async () => {
-            const badges = [];
-
-            const ffzUser =
-                await getFFZUser(
-                    userId
-                );
-
-            if (ffzUser) {
-                const ffzUserBadges =
-                    ffzUser.badges || {};
-
-                for (
-                    const [
-                        id,
-                        badge
-                    ]
-                    of Object.entries(
-                        ffzUserBadges
-                    )
-                ) {
-                    const url =
-                        badge?.urls?.["4"] ||
-                        badge?.urls?.["2"] ||
-                        badge?.urls?.["1"] ||
-                        badge?.image;
-
-                    if (!url) {
-                        continue;
-                    }
-
-                    const normalizedUrl =
-                        normalizeImageUrl(
-                            url
-                        );
-
-                    if (!normalizedUrl) {
-                        continue;
-                    }
-
-                    badges.push({
-                        url:
-                            normalizedUrl,
-
-                        title:
-                            badge?.title ||
-                            badge?.name ||
-                            `FFZ ${id}`
-                    });
-
-                    preloadBadgeImage(
-                        normalizedUrl
-                    );
-                }
-            }
-
-            const sevenTV =
-                await load7TVUserBadges(
-                    userId
-                );
-
-            for (
-                const badge
-                of sevenTV
-            ) {
-                let url =
-                    badge.loadedUrl ||
-                    null;
-
-                if (!url) {
-                    for (
-                        const candidate
-                        of badge.urls || []
-                    ) {
-                        const image =
-                            await preloadBadgeImage(
-                                candidate
-                            );
-
-                        if (image) {
-                            url =
-                                candidate;
-
-                            break;
-                        }
-                    }
-                }
-
-                if (!url) {
-                    continue;
-                }
-
-                badges.push({
-                    url,
-
-                    title:
-                        badge.name ||
-                        "7TV"
-                });
-            }
-
-            return badges;
-        })();
-
-    externalBadgePromises.set(
-        userId,
-        promise
-    );
-
-    try {
-        const badges =
-            await promise;
-
-        externalBadgeCache.set(
-            userId,
-            badges
-        );
-
-        for (
-            const badge
-            of badges
-        ) {
-            const img =
-                createBadge(
-                    badge.url,
-                    badge.title
-                );
-
-            if (img) {
-                container.appendChild(
-                    img
-                );
-            }
-        }
-
-        return container;
-
-    } finally {
-        externalBadgePromises.delete(
-            userId
-        );
-    }
-}
 
 function createEmote(
     url,
@@ -4218,6 +4382,7 @@ async function onMsg(
         }
     }
 
+
     const usernameElement =
         document.createElement(
             "span"
@@ -4240,11 +4405,13 @@ async function onMsg(
     usernameElement.style.webkitTextFillColor =
         usernameColor;
 
+
     const text =
         renderMessageText(
             replyInfo.message,
             tags
         );
+
 
     if (
         tags["is-action"]
@@ -4292,6 +4459,7 @@ async function onMsg(
         message
     );
 
+
     if (userId) {
         get7TVPaint(
             userId
@@ -4306,7 +4474,8 @@ async function onMsg(
             });
 
         createExternalBadges(
-            userId
+            userId,
+            tags
         )
             .then(externalBadges => {
                 if (
@@ -4321,6 +4490,7 @@ async function onMsg(
             });
     }
 
+
     setTimeout(() => {
         message.style.animation =
             "messageFadeOut 1s ease-in forwards";
@@ -4331,7 +4501,6 @@ async function onMsg(
 
     }, 14000);
 }
-
 
 function parseIRCtags(raw) {
     const tags = {};
