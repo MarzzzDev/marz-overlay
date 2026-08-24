@@ -2513,20 +2513,45 @@ function createTwitchBadges(tags) {
                 slash + 1
             );
 
+        /*
+         * Try the Twitch badge API cache first.
+         */
         const badge =
             twitchBadges.get(
                 `${set}/${version}`
             );
 
-        if (!badge) {
-            continue;
+        let badgeUrl =
+            badge?.url || null;
+
+        let badgeTitle =
+            badge?.title ||
+            set;
+
+
+        /*
+         * Fallback to Twitch's public badge CDN.
+         *
+         * This is especially useful when a message
+         * arrives before the Twitch badge API has
+         * finished loading.
+         */
+        if (!badgeUrl) {
+            badgeUrl =
+                `https://static-cdn.jtvnw.net/badges/v1/${encodeURIComponent(
+                    set
+                )}/${encodeURIComponent(
+                    version
+                )}/2`;
         }
+
 
         const img =
             createBadge(
-                badge.url,
-                set
+                badgeUrl,
+                badgeTitle
             );
+
 
         if (img) {
             img.dataset.badgeType =
@@ -2537,6 +2562,7 @@ function createTwitchBadges(tags) {
             );
         }
     }
+
 
     return container;
 }
