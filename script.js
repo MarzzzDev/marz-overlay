@@ -2099,27 +2099,40 @@ async function loadTwitchBadges() {
     }
 }
 
-function addTwitchBadges(sets) {
-    for (
-        const set
-        of sets
-    ) {
-        for (
-            const version
-            of set.versions || []
-        ) {
+function addTwitchBadges(badgeSets) {
+    for (const set of badgeSets) {
+        if (!set || !set.set_id) {
+            continue;
+        }
+
+        const setId =
+            set.set_id;
+
+        for (const version of (
+            set.versions || []
+        )) {
+            if (!version?.id) {
+                continue;
+            }
+
             const key =
-                `${set.set_id}/${version.id}`;
+                `${setId}/${version.id}`;
 
             twitchBadges.set(
                 key,
                 {
-                    url:
-                        version.image_url_2x ||
+                    title:
+                        set.title ||
+                        setId,
+
+                    url_1x:
                         version.image_url_1x,
 
-                    title:
-                        set.set_id
+                    url_2x:
+                        version.image_url_2x,
+
+                    url_3x:
+                        version.image_url_3x
                 }
             );
         }
@@ -2515,10 +2528,7 @@ function createTwitchBadges(tags) {
             .split(",")
             .filter(Boolean);
 
-    for (
-        const entry
-        of entries
-    ) {
+    for (const entry of entries) {
         const slash =
             entry.indexOf("/");
 
@@ -2527,66 +2537,102 @@ function createTwitchBadges(tags) {
         }
 
         const set =
-            entry.substring(
-                0,
-                slash
-            );
+            entry.substring(0, slash);
 
         const version =
-            entry.substring(
-                slash + 1
-            );
+            entry.substring(slash + 1);
 
-        /*
-         * Try the Twitch badge API cache first.
-         */
+        const key =
+            `${set}/${version}`;
+
         const badge =
-            twitchBadges.get(
-                `${set}/${version}`
+            twitchBadges.get(key);
+
+        if (!badge) {
+            console.warn(
+                "Twitch badge not found:",
+                key
             );
 
-        let badgeUrl =
-            badge?.url || null;
-
-        let badgeTitle =
-            badge?.title ||
-            set;
-
-
-        /*
-         * Fallback to Twitch's public badge CDN.
-         *
-         * This is especially useful when a message
-         * arrives before the Twitch badge API has
-         * finished loading.
-         */
-        if (!badgeUrl) {
-            badgeUrl =
-                `https://static-cdn.jtvnw.net/badges/v1/${encodeURIComponent(
-                    set
-                )}/${encodeURIComponent(
-                    version
-                )}/2`;
+            continue;
         }
 
+        /*
+         * Twitch returns:
+         *
+         * url_1x
+         * url_2x
+         * url_3x
+         *
+         * Use the 2x version for the overlay.
+         */
+        const badgeUrl =
+            badge.url_2x ||
+            badge.url_1x ||
+            badge.url_3x;
+
+        if (!badgeUrl) {
+            console.warn(
+                "Twitch badge has no image URL:",
+                badge
+            );
+
+            continue;
+        }
 
         const img =
-            createBadge(
-                badgeUrl,
-                badgeTitle
-            );
+            document.createElement("img");
 
+        img.src =
+            badgeUrl;
 
-        if (img) {
-            img.dataset.badgeType =
-                set;
+        img.alt =
+            badge.title ||
+            set;
 
-            container.appendChild(
-                img
-            );
-        }
+        img.title =
+            badge.title ||
+            set;
+
+        img.className =
+            "badge";
+
+        img.dataset.badgeType =
+            set;
+
+        img.width =
+            18;
+
+        img.height =
+            18;
+
+        img.style.width =
+            "18px";
+
+        img.style.height =
+            "18px";
+
+        img.style.objectFit =
+            "contain";
+
+        /*
+         * If Twitch's URL fails, log the actual URL
+         * so we can see exactly what is happening.
+         */
+        img.onerror =
+            function() {
+                console.error(
+                    "Failed to load Twitch badge:",
+                    {
+                        key,
+                        url: badgeUrl,
+                        badge
+                    }
+                );
+            };
+
+        container.appendChild(img);
     }
-
 
     return container;
 }
