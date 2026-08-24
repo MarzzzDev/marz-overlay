@@ -1,6 +1,6 @@
 const TWITCH_CLIENT_ID = "l2f4c48jfsoflno8qg5vhoy79zw4pd";
-const CHANNEL = "marz_dev";
-const TWITCH_USER_ID = "1208634685";
+let CHANNEL = null;
+let TWITCH_USER_ID = null;
 
 const TWITCH_OAUTH_SCOPES = [
     "user:read:chat"
@@ -259,6 +259,9 @@ async function validateTwitchToken() {
             data.login ||
             data.user_name ||
             authenticatedUsername;
+
+        TWITCH_USER_ID = authenticatedUserId;
+        CHANNEL = authenticatedUsername;
 
         saveTwitchAuth();
 
@@ -5227,16 +5230,6 @@ async function subscribeToChat() {
         return;
     }
 
-    /*
-     * For WebSocket EventSub, Twitch requires
-     * a USER access token.
-     *
-     * channel.chat.message requires:
-     * user:read:chat
-     *
-     * The user_id condition is the user represented
-     * by the access token.
-     */
     const body = {
         type:
             "channel.chat.message",
@@ -5246,7 +5239,7 @@ async function subscribeToChat() {
 
         condition: {
             broadcaster_user_id:
-                String(TWITCH_USER_ID),
+                String(authenticatedUserId),
 
             user_id:
                 String(authenticatedUserId)
