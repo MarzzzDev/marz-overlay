@@ -1994,17 +1994,23 @@ async function get7TVPaint(userId) {
 
 async function loadTwitchBadges() {
     try {
+        if (!accessToken) {
+            throw new Error(
+                "No Twitch access token available."
+            );
+        }
+
         const headers = {
             "Client-ID":
                 TWITCH_CLIENT_ID,
 
             "Authorization":
-                `Bearer ${OAUTH_TOKEN.replace(
-                    /^oauth:/,
-                    ""
-                )}`
+                `Bearer ${accessToken}`
         };
 
+        /*
+         * Load global Twitch badges
+         */
         const globalResponse =
             await fetch(
                 "https://api.twitch.tv/helix/chat/badges/global",
@@ -2026,6 +2032,10 @@ async function loadTwitchBadges() {
             globalData.data || []
         );
 
+
+        /*
+         * Find the broadcaster's Twitch user ID.
+         */
         const userResponse =
             await fetch(
                 `https://api.twitch.tv/helix/users?login=${encodeURIComponent(
@@ -2048,6 +2058,10 @@ async function loadTwitchBadges() {
         const broadcasterId =
             userData.data?.[0]?.id;
 
+
+        /*
+         * Load channel-specific badges.
+         */
         if (broadcasterId) {
             const channelResponse =
                 await fetch(
@@ -2057,7 +2071,12 @@ async function loadTwitchBadges() {
                     }
                 );
 
-            if (channelResponse.ok) {
+            if (!channelResponse.ok) {
+                console.warn(
+                    "Twitch channel badges:",
+                    channelResponse.status
+                );
+            } else {
                 const channelData =
                     await channelResponse.json();
 
@@ -2066,6 +2085,11 @@ async function loadTwitchBadges() {
                 );
             }
         }
+
+
+        console.log(
+            `Loaded ${twitchBadges.size} Twitch badges.`
+        );
 
     } catch (error) {
         console.error(
