@@ -96,6 +96,15 @@ function getOAuthRedirectUri() {
     return window.location.origin + window.location.pathname;
 }
 
+const params = new URLSearchParams(window.location.search);
+
+const backgroundDisabled =
+    params.get("background")?.toLowerCase() === "false";
+
+document.body.classList.toggle(
+    "no-background",
+    backgroundDisabled
+);
 
 function saveTwitchAuth() {
     if (!accessToken) {
