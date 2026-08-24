@@ -2101,34 +2101,16 @@ async function loadTwitchBadges() {
 
 function addTwitchBadges(badgeSets) {
     for (const set of badgeSets || []) {
-        if (!set?.set_id) {
-            continue;
-        }
-
-        const setId = set.set_id;
-
         for (const version of set.versions || []) {
-            if (!version?.id) {
-                continue;
-            }
-
-            const key =
-                `${setId}/${version.id}`;
-
-            twitchBadges.set(key, {
-                title:
-                    set.title ||
-                    setId,
-
-                url_1x:
-                    version.image_url_1x || "",
-
-                url_2x:
-                    version.image_url_2x || "",
-
-                url_3x:
-                    version.image_url_3x || ""
-            });
+            twitchBadges.set(
+                `${set.set_id}/${version.id}`,
+                {
+                    title: version.title || set.set_id,
+                    url_1x: version.image_url_1x,
+                    url_2x: version.image_url_2x,
+                    url_4x: version.image_url_4x
+                }
+            );
         }
     }
 }
@@ -2533,30 +2515,20 @@ function createTwitchBadges(tags) {
         const version =
             entry.substring(slash + 1);
 
-        const key =
-            `${set}/${version}`;
-
-        const badge =
-            twitchBadges.get(key);
-
-        if (!badge) {
-            console.warn(
-                "Twitch badge data not found:",
-                key
-            );
-            continue;
-        }
+        // PUT IT HERE
+        const badge = twitchBadges.get(
+            `${set}/${version}`
+        );
 
         const badgeUrl =
-            badge.url_2x ||
-            badge.url_1x ||
-            badge.url_3x;
+            badge?.url_2x ||
+            badge?.url_1x ||
+            badge?.url_4x;
 
         if (!badgeUrl) {
             console.warn(
-                "Twitch badge has no image URL:",
-                key,
-                badge
+                "Twitch badge not found:",
+                `${set}/${version}`
             );
             continue;
         }
@@ -2571,34 +2543,19 @@ function createTwitchBadges(tags) {
             badgeUrl;
 
         img.alt =
-            badge.title ||
+            badge?.title ||
             set;
 
         img.title =
-            badge.title ||
+            badge?.title ||
             set;
 
         img.width = 18;
         img.height = 18;
 
-        img.style.width =
-            "18px";
-
-        img.style.height =
-            "18px";
-
-        img.style.objectFit =
-            "contain";
-
-        img.onerror = () => {
-            console.error(
-                "Failed to load Twitch badge:",
-                {
-                    key,
-                    url: badgeUrl
-                }
-            );
-        };
+        img.style.width = "18px";
+        img.style.height = "18px";
+        img.style.objectFit = "contain";
 
         container.appendChild(img);
     }
