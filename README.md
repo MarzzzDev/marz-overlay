@@ -17,6 +17,7 @@ A feature-packed chat overlay built with customization in mind, bringing effects
 | `fade`       | Configure fade effects (default = 15; false = no fade)           |
 | `badges`     | Display supported badges (default = true)                        |
 | `scale`      | Change scale of chat messages (default = 1)                      |
+| `wrap`       | Wrap messages down after the username (default = false)          |
 
 > **Marz' Overlay** aims to provide a highly customizable chat experience with features you won't find in many other chat overlays.
 > **Features coming soon:** easy customization with previews, cheer animations..
