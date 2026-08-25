@@ -98,13 +98,19 @@ function getOAuthRedirectUri() {
 
 const params = new URLSearchParams(window.location.search);
 
-const backgroundDisabled =
-    params.get("background")?.toLowerCase() === "false";
+const backgroundEnabled =
+    params.get("background")?.toLowerCase() === "true";
 
 document.body.classList.toggle(
-    "no-background",
-    backgroundDisabled
+    "has-background",
+    backgroundEnabled
 );
+
+const fadeParam = params.get("fade");
+
+const fade = fadeParam?.toLowerCase() === "false"
+    ? false
+    : Number(fadeParam ?? 15);
 
 function saveTwitchAuth() {
     if (!accessToken) {
@@ -4499,16 +4505,17 @@ async function onMsg(
             });
     }
 
-
-    setTimeout(() => {
-        message.style.animation =
-            "messageFadeOut 1s ease-in forwards";
-
+    if (fade != false) {
         setTimeout(() => {
-            message.remove();
-        }, 1000);
+            message.style.animation =
+                "messageFadeOut 1s ease-in forwards";
 
-    }, 14000);
+            setTimeout(() => {
+                message.remove();
+            }, 1000);
+
+        }, fade * 1000 - 1000);
+    }
 }
 
 function parseIRCtags(raw) {

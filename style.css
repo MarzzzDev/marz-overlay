@@ -9,6 +9,7 @@ body {
 
     font-family: 'Open Sans', sans-serif;
 }
+
 .message {
     display: flex;
     align-items: center;
@@ -30,17 +31,11 @@ body {
     line-height: 30px;
     border-radius: 14px;
 
-    background: linear-gradient(
-        90deg,
-        rgba(45, 12, 18, 0.9),
-        rgba(65, 18, 25, 0.75)
-    );
+    background: transparent;
 
     border-left: none;
 
-    box-shadow:
-        0 4px 14px rgba(0, 0, 0, 0.45),
-        inset 0 0 18px rgba(255, 50, 50, 0.06);
+    box-shadow: none;
 
     animation: messageIn 0.25s ease-out forwards;
 
@@ -50,6 +45,7 @@ body {
 
     min-width: 0;
 }
+
 body.has-background .message {
     background: linear-gradient(
         90deg,
@@ -80,14 +76,12 @@ body.has-background .message.redeem-message {
         0 0 12px rgba(40, 120, 255, 0.18);
 }
 
-
 body.has-background .message.redeem-message:hover {
     box-shadow:
         0 4px 18px rgba(0, 0, 0, 0.5),
         inset 0 0 20px rgba(70, 150, 255, 0.22),
         0 0 18px rgba(40, 120, 255, 0.25);
 }
-
 
 #chat {
     width: 200%;
@@ -127,6 +121,7 @@ body.has-background .message.redeem-message:hover {
     }
 }
 
+
 @keyframes messageFadeOut {
     from {
         opacity: 1;
@@ -155,6 +150,7 @@ body.has-background .message.redeem-message:hover {
 
     flex: 0 0 auto;
 }
+
 
 .badge {
     width: 45px;
@@ -205,7 +201,6 @@ body.has-background .message.redeem-message:hover {
     -webkit-font-smoothing: antialiased;
 }
 
-
 .text {
     color: #ffffff;
 
@@ -233,7 +228,6 @@ body.has-background .message.redeem-message:hover {
     -webkit-font-smoothing: antialiased;
 }
 
-
 .emote {
     height: 65px;
     width: auto;
@@ -252,6 +246,7 @@ body.has-background .message.redeem-message:hover {
 
     transition: transform 0.15s ease;
 }
+
 
 .twemoji {
     height: 65px;
@@ -281,14 +276,15 @@ body.has-background .message.redeem-message:hover {
         scaleY(var(--ffz-scale-y, 1));
 }
 
+
 .emote:hover {
     transform: scale(1.08);
 }
 
-
 .external-badges {
     margin-left: 2px;
 }
+
 
 .twitch-badges {
     margin-right: 5px;
@@ -309,24 +305,11 @@ body.has-background .message.redeem-message:hover {
 
 .message:hover {
     border-left: none;
+    box-shadow: none;
 }
 
 body.has-background .message:hover {
     box-shadow:
         0 4px 18px rgba(0, 0, 0, 0.5),
         0 0 15px rgba(255, 50, 50, 0.14);
-}
-
-body.no-background .message {
-    background: transparent;
-    box-shadow: none;
-}
-
-body.no-background .message:hover {
-    box-shadow: none;
-}
-
-body.no-background .message.redeem-message {
-    background: transparent;
-    box-shadow: none;
 }
