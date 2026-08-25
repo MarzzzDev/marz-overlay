@@ -499,8 +499,8 @@ function showTwitchLoginScreen() {
 
         display: flex;
 
-        background: #1f1f21;
-        color: #d8d8dc;
+        background: #18181b;
+        color: #ffffff;
 
         font-family:
             Arial,
@@ -520,12 +520,12 @@ function showTwitchLoginScreen() {
 
         box-sizing: border-box;
 
-        padding: 76px 19px 18px;
+        padding: 24px 19px 18px;
 
-        background: #242426;
+        background: #202024;
 
         border-right:
-            1px solid #3a3a3e;
+            1px solid #35353b;
 
         overflow-y: auto;
     `;
@@ -538,7 +538,7 @@ function showTwitchLoginScreen() {
         min-width: 0;
         height: 100vh;
 
-        background: #1f1f21;
+        background: #18181b;
     `;
 
     const title =
@@ -548,12 +548,12 @@ function showTwitchLoginScreen() {
         "Marz' Chat Overlay";
 
     title.style.cssText = `
-        font-size: 18px;
-        font-weight: 600;
+        font-size: 19px;
+        font-weight: 700;
 
-        color: #d8d8dc;
+        color: #ffffff;
 
-        margin-bottom: 3px;
+        margin-bottom: 4px;
     `;
 
     const description =
@@ -565,9 +565,9 @@ function showTwitchLoginScreen() {
     description.style.cssText = `
         font-size: 12px;
 
-        color: #a3a3a8;
+        color: #a8a8b3;
 
-        margin-bottom: 16px;
+        margin-bottom: 18px;
     `;
 
     const channelLabel =
@@ -580,9 +580,9 @@ function showTwitchLoginScreen() {
         display: block;
 
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
 
-        color: #d0d0d4;
+        color: #e2e2e8;
 
         margin-bottom: 6px;
     `;
@@ -607,31 +607,34 @@ function showTwitchLoginScreen() {
 
     channelInput.style.cssText = `
         width: 100%;
-        height: 30px;
+        height: 32px;
 
         box-sizing: border-box;
 
-        padding: 0 9px;
+        padding: 0 10px;
 
         border:
-            1px solid #3c3c41;
+            1px solid #46464f;
 
-        border-radius: 7px;
+        border-radius: 6px;
 
-        background: #1a1a1c;
+        background: #151518;
 
-        color: #dedee2;
+        color: #ffffff;
 
         outline: none;
 
         font-size: 12px;
+
+        transition:
+            border-color .15s ease;
     `;
 
     channelInput.addEventListener(
         "focus",
         () => {
             channelInput.style.borderColor =
-                "#8b4dcc";
+                "#9147ff";
         }
     );
 
@@ -639,7 +642,7 @@ function showTwitchLoginScreen() {
         "blur",
         () => {
             channelInput.style.borderColor =
-                "#3c3c41";
+                "#46464f";
         }
     );
 
@@ -650,13 +653,13 @@ function showTwitchLoginScreen() {
         "Overlay Settings";
 
     settingsTitle.style.cssText = `
-        margin-top: 15px;
+        margin-top: 17px;
         margin-bottom: 9px;
 
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
 
-        color: #d0d0d4;
+        color: #e2e2e8;
     `;
 
     const settings =
@@ -665,7 +668,7 @@ function showTwitchLoginScreen() {
     settings.style.cssText = `
         display: flex;
         flex-direction: column;
-        gap: 7px;
+        gap: 8px;
     `;
 
     function createToggle(
@@ -688,7 +691,7 @@ function showTwitchLoginScreen() {
 
             font-size: 12px;
 
-            color: #d2d2d6;
+            color: #d8d8df;
 
             user-select: none;
         `;
@@ -715,15 +718,15 @@ function showTwitchLoginScreen() {
             document.createElement("span");
 
         toggle.style.cssText = `
-            width: 33px;
+            width: 34px;
             height: 18px;
 
             border-radius: 20px;
 
             background:
                 ${checked
-                    ? "#8a4bc2"
-                    : "#55555a"};
+                    ? "#9147ff"
+                    : "#4a4a52"};
 
             position: relative;
 
@@ -744,7 +747,7 @@ function showTwitchLoginScreen() {
 
             border-radius: 50%;
 
-            background: #d9d9dd;
+            background: #ffffff;
 
             left: 2px;
             top: 2px;
@@ -757,7 +760,7 @@ function showTwitchLoginScreen() {
 
         knob.style.transform =
             checked
-                ? "translateX(15px)"
+                ? "translateX(16px)"
                 : "translateX(0)";
 
         toggle.appendChild(
@@ -769,12 +772,12 @@ function showTwitchLoginScreen() {
             () => {
                 toggle.style.background =
                     checkbox.checked
-                        ? "#8a4bc2"
-                        : "#55555a";
+                        ? "#9147ff"
+                        : "#4a4a52";
 
                 knob.style.transform =
                     checkbox.checked
-                        ? "translateX(15px)"
+                        ? "translateX(16px)"
                         : "translateX(0)";
             }
         );
@@ -839,13 +842,13 @@ function showTwitchLoginScreen() {
         "Animation & Scaling";
 
     animationTitle.style.cssText = `
-        margin-top: 15px;
+        margin-top: 17px;
         margin-bottom: 9px;
 
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
 
-        color: #d0d0d4;
+        color: #e2e2e8;
     `;
 
     const fadeLabel =
@@ -860,9 +863,9 @@ function showTwitchLoginScreen() {
         margin-bottom: 6px;
 
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
 
-        color: #d0d0d4;
+        color: #e2e2e8;
     `;
 
     const fadeInput =
@@ -890,20 +893,20 @@ function showTwitchLoginScreen() {
 
     fadeInput.style.cssText = `
         width: 100%;
-        height: 30px;
+        height: 32px;
 
         box-sizing: border-box;
 
-        padding: 0 9px;
+        padding: 0 10px;
 
         border:
-            1px solid #3c3c41;
+            1px solid #46464f;
 
-        border-radius: 7px;
+        border-radius: 6px;
 
-        background: #1a1a1c;
+        background: #151518;
 
-        color: #dedee2;
+        color: #ffffff;
 
         outline: none;
 
@@ -914,8 +917,8 @@ function showTwitchLoginScreen() {
         document.createElement("div");
 
     fadeNoWrapper.style.cssText = `
-        margin-top: 7px;
-        margin-bottom: 15px;
+        margin-top: 8px;
+        margin-bottom: 17px;
     `;
 
     const noFade =
@@ -941,7 +944,7 @@ function showTwitchLoginScreen() {
 
             fadeInput.style.opacity =
                 noFade.checked
-                    ? ".45"
+                    ? ".4"
                     : "1";
         }
     );
@@ -951,7 +954,7 @@ function showTwitchLoginScreen() {
 
     if (noFade.checked) {
         fadeInput.style.opacity =
-            ".45";
+            ".4";
     }
 
     const scaleLabel =
@@ -966,9 +969,9 @@ function showTwitchLoginScreen() {
         margin-bottom: 6px;
 
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
 
-        color: #d0d0d4;
+        color: #e2e2e8;
     `;
 
     const scaleInput =
@@ -991,20 +994,20 @@ function showTwitchLoginScreen() {
 
     scaleInput.style.cssText = `
         width: 100%;
-        height: 30px;
+        height: 32px;
 
         box-sizing: border-box;
 
-        padding: 0 9px;
+        padding: 0 10px;
 
         border:
-            1px solid #3c3c41;
+            1px solid #46464f;
 
-        border-radius: 7px;
+        border-radius: 6px;
 
-        background: #1a1a1c;
+        background: #151518;
 
-        color: #dedee2;
+        color: #ffffff;
 
         outline: none;
 
@@ -1021,47 +1024,132 @@ function showTwitchLoginScreen() {
         display: none;
 
         margin-top: 10px;
-        padding: 8px 9px;
+        padding: 8px 10px;
 
         background:
-            rgba(239, 68, 68, .1);
+            rgba(239, 68, 68, .12);
 
         border:
-            1px solid rgba(239, 68, 68, .3);
+            1px solid rgba(239, 68, 68, .4);
 
         border-radius: 6px;
 
-        color: #fca5a5;
+        color: #ff8c8c;
 
         font-size: 11px;
     `;
 
-    const button =
+    function getOverlayUrl() {
+        const channel =
+            channelInput.value
+                .trim()
+                .toLowerCase()
+                .replace(/^#/, "");
+
+        if (!channel) {
+            error.textContent =
+                "Enter a Twitch channel.";
+
+            error.style.display =
+                "block";
+
+            return null;
+        }
+
+        error.style.display =
+            "none";
+
+        const overlaySettings = {
+            background:
+                backgroundCheckbox.checked,
+
+            fade:
+                noFade.checked
+                    ? false
+                    : Math.max(
+                        1,
+                        Number(
+                            fadeInput.value
+                        ) || 15
+                    ),
+
+            badges:
+                badgesCheckbox.checked,
+
+            scale:
+                Math.max(
+                    0.25,
+                    Math.min(
+                        Number(
+                            scaleInput.value
+                        ) || 1,
+                        3
+                    )
+                ),
+
+            wrap:
+                wrapCheckbox.checked,
+
+            unlisted:
+                unlistedCheckbox.checked
+        };
+
+        const encodedSettings =
+            btoa(
+                encodeURIComponent(
+                    JSON.stringify(
+                        overlaySettings
+                    )
+                )
+            )
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=+$/, "");
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+        url.search = "";
+
+        url.searchParams.set(
+            "channel",
+            channel
+        );
+
+        url.searchParams.set(
+            "settings",
+            encodedSettings
+        );
+
+        return url.toString();
+    }
+
+    const authorizeButton =
         document.createElement("button");
 
-    button.type =
+    authorizeButton.type =
         "button";
 
-    button.textContent =
-        accessToken
-            ? "Create Overlay"
-            : "Authorize Twitch";
+    authorizeButton.textContent =
+        "Authorize Twitch";
 
-    button.style.cssText = `
+    authorizeButton.style.cssText = `
         width: 100%;
-        height: 32px;
+        height: 34px;
 
-        margin-top: 16px;
+        margin-top: 17px;
 
         border: none;
-        border-radius: 4px;
+        border-radius: 5px;
 
-        background: #7c3fb2;
+        background: #9147ff;
 
-        color: #f1edf5;
+        color: #ffffff;
 
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
 
         cursor: pointer;
 
@@ -1069,19 +1157,167 @@ function showTwitchLoginScreen() {
             background .15s ease;
     `;
 
-    button.addEventListener(
+    authorizeButton.addEventListener(
         "mouseenter",
         () => {
-            button.style.background =
-                "#8b4fc2";
+            authorizeButton.style.background =
+                "#772ce8";
         }
     );
 
-    button.addEventListener(
+    authorizeButton.addEventListener(
         "mouseleave",
         () => {
-            button.style.background =
-                "#7c3fb2";
+            authorizeButton.style.background =
+                "#9147ff";
+        }
+    );
+
+    authorizeButton.addEventListener(
+        "click",
+        () => {
+            const url =
+                getOverlayUrl();
+
+            if (!url) {
+                return;
+            }
+
+            if (accessToken) {
+                authorizeButton.textContent =
+                    "Twitch Authorized";
+
+                return;
+            }
+
+            localStorage.setItem(
+                "twitch_overlay_pending_url",
+                url
+            );
+
+            startTwitchLogin();
+        }
+    );
+
+    const copyButton =
+        document.createElement("button");
+
+    copyButton.type =
+        "button";
+
+    copyButton.textContent =
+        "Copy Overlay Link";
+
+    copyButton.style.cssText = `
+        width: 100%;
+        height: 34px;
+
+        margin-top: 8px;
+
+        border:
+            1px solid #55555f;
+
+        border-radius: 5px;
+
+        background: #2b2b31;
+
+        color: #ffffff;
+
+        font-size: 12px;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition:
+            background .15s ease,
+            border-color .15s ease;
+    `;
+
+    copyButton.addEventListener(
+        "mouseenter",
+        () => {
+            copyButton.style.background =
+                "#35353d";
+
+            copyButton.style.borderColor =
+                "#777783";
+        }
+    );
+
+    copyButton.addEventListener(
+        "mouseleave",
+        () => {
+            copyButton.style.background =
+                "#2b2b31";
+
+            copyButton.style.borderColor =
+                "#55555f";
+        }
+    );
+
+    copyButton.addEventListener(
+        "click",
+        async () => {
+            const url =
+                getOverlayUrl();
+
+            if (!url) {
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(
+                    url
+                );
+
+                copyButton.textContent =
+                    "Copied!";
+
+                setTimeout(
+                    () => {
+                        copyButton.textContent =
+                            "Copy Overlay Link";
+                    },
+                    1500
+                );
+            } catch {
+                const textarea =
+                    document.createElement(
+                        "textarea"
+                    );
+
+                textarea.value =
+                    url;
+
+                textarea.style.position =
+                    "fixed";
+
+                textarea.style.opacity =
+                    "0";
+
+                document.body.appendChild(
+                    textarea
+                );
+
+                textarea.select();
+
+                document.execCommand(
+                    "copy"
+                );
+
+                textarea.remove();
+
+                copyButton.textContent =
+                    "Copied!";
+
+                setTimeout(
+                    () => {
+                        copyButton.textContent =
+                            "Copy Overlay Link";
+                    },
+                    1500
+                );
+            }
         }
     );
 
@@ -1089,117 +1325,16 @@ function showTwitchLoginScreen() {
         document.createElement("div");
 
     footer.textContent =
-        "You will be redirected to Twitch to authorize the overlay.";
+        "Authorize Twitch to connect your account, or copy the overlay link for OBS.";
 
     footer.style.cssText = `
         margin-top: 9px;
 
-        padding: 0 3px;
-
-        color: #929297;
+        color: #858590;
 
         font-size: 10px;
-        line-height: 1.4;
+        line-height: 1.45;
     `;
-
-    button.addEventListener(
-        "click",
-        () => {
-            const channel =
-                channelInput.value
-                    .trim()
-                    .toLowerCase()
-                    .replace(/^#/, "");
-
-            if (!channel) {
-                error.textContent =
-                    "Enter a Twitch channel.";
-
-                error.style.display =
-                    "block";
-
-                return;
-            }
-
-            const settings = {
-                background:
-                    backgroundCheckbox.checked,
-
-                fade:
-                    noFade.checked
-                        ? false
-                        : Math.max(
-                            1,
-                            Number(
-                                fadeInput.value
-                            ) || 15
-                        ),
-
-                badges:
-                    badgesCheckbox.checked,
-
-                scale:
-                    Math.max(
-                        0.25,
-                        Math.min(
-                            Number(
-                                scaleInput.value
-                            ) || 1,
-                            3
-                        )
-                    ),
-
-                wrap:
-                    wrapCheckbox.checked,
-
-                unlisted:
-                    unlistedCheckbox.checked
-            };
-
-            const encodedSettings =
-                btoa(
-                    encodeURIComponent(
-                        JSON.stringify(
-                            settings
-                        )
-                    )
-                )
-                    .replace(/\+/g, "-")
-                    .replace(/\//g, "_")
-                    .replace(/=+$/, "");
-
-            const url =
-                new URL(
-                    window.location.href
-                );
-
-            url.search = "";
-
-            url.searchParams.set(
-                "channel",
-                channel
-            );
-
-            url.searchParams.set(
-                "settings",
-                encodedSettings
-            );
-
-            if (!accessToken) {
-                localStorage.setItem(
-                    "twitch_overlay_pending_url",
-                    url.toString()
-                );
-
-                startTwitchLogin();
-
-                return;
-            }
-
-            window.location.href =
-                url.toString();
-        }
-    );
 
     sidebar.appendChild(
         title
@@ -1254,7 +1389,11 @@ function showTwitchLoginScreen() {
     );
 
     sidebar.appendChild(
-        button
+        authorizeButton
+    );
+
+    sidebar.appendChild(
+        copyButton
     );
 
     sidebar.appendChild(
