@@ -125,7 +125,7 @@ const wrapEnabled =
     params.get("wrap")?.toLowerCase() === "true";
 
 const showUnlisted7TV =
-    params.get("hide_unlisted")?.toLowerCase() !== "false";
+    params.get("unlisted")?.toLowerCase() !== "false";
 
 function saveTwitchAuth() {
     if (!accessToken) {
