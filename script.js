@@ -125,7 +125,7 @@ const wrapEnabled =
     params.get("wrap")?.toLowerCase() === "true";
 
 const showUnlisted7TV =
-    params.get("unlisted")?.toLowerCase() !== "false";
+    params.get("hide_unlisted")?.toLowerCase() !== "false";
 
 function saveTwitchAuth() {
     if (!accessToken) {
@@ -1354,58 +1354,64 @@ function createPaintDropShadowFilter(paint) {
         paint?.data?.shadows || [];
 
     if (
-        !Array.isArray(shadows) ||
-        !shadows.length
+        Array.isArray(shadows) &&
+        shadows.length
     ) {
-        return "none";
-    }
+        const filters = [];
 
-    const filters = [];
+        for (
+            const shadow
+            of shadows
+        ) {
+            if (!shadow) {
+                continue;
+            }
 
-    for (
-        const shadow
-        of shadows
-    ) {
-        if (!shadow) {
-            continue;
+            const color =
+                colorToCss(
+                    shadow.color
+                );
+
+            const offsetX =
+                Number(
+                    shadow.offsetX ?? 0
+                ) * 2;
+
+            const offsetY =
+                Number(
+                    shadow.offsetY ?? 0
+                ) * 2;
+
+            const blur =
+                Math.max(
+                    0,
+                    Number(
+                        shadow.blur ?? 0
+                    ) * 2
+                );
+
+            filters.push(
+                `drop-shadow(` +
+                `${offsetX}px ` +
+                `${offsetY}px ` +
+                `${blur}px ` +
+                `${color}` +
+                `)`
+            );
         }
 
-        const color =
-            colorToCss(
-                shadow.color
-            );
-
-        const offsetX =
-            Number(
-                shadow.offsetX ?? 0
-            ) * 2;
-
-        const offsetY =
-            Number(
-                shadow.offsetY ?? 0
-            ) * 2;
-
-        const blur =
-            Math.max(
-                0,
-                Number(
-                    shadow.blur ?? 0
-                ) * 2
-            );
-
-        filters.push(
-            `drop-shadow(` +
-            `${offsetX}px ` +
-            `${offsetY}px ` +
-            `${blur}px ` +
-            `${color}` +
-            `)`
-        );
+        if (filters.length) {
+            return filters.join(" ");
+        }
     }
 
-    return filters.length
-        ? filters.join(" ")
-        : "none";
+    const fallbackColor =
+        getPaintFallbackColor(paint);
+
+    return (
+        `drop-shadow(0px 0px 6px ${fallbackColor}) ` +
+        `drop-shadow(0px 0px 2px ${fallbackColor})`
+    );
 }
 
 function getPaintFallbackColor(paint) {
