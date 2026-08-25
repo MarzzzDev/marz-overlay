@@ -112,6 +112,9 @@ const fade = fadeParam?.toLowerCase() === "false"
     ? false
     : Number(fadeParam ?? 15);
 
+const badgesEnabled =
+    params.get("badges")?.toLowerCase() !== "false";
+
 function saveTwitchAuth() {
     if (!accessToken) {
         return;
@@ -4369,11 +4372,11 @@ async function onMsg(
         "--user-color",
         usernameColor
     );
-
+    
     const badges =
-        createTwitchBadges(
-            tags
-        );
+        badgesEnabled
+            ? createTwitchBadges(tags)
+            : document.createElement("span");
 
     const ffzRoomBadge =
         createFFZRoomBadge(
@@ -4488,21 +4491,23 @@ async function onMsg(
                 }
             });
 
-        createExternalBadges(
-            userId,
-            tags
-        )
-            .then(externalBadges => {
-                if (
-                    externalBadges.children.length >
-                    0
-                ) {
-                    message.insertBefore(
-                        externalBadges,
-                        usernameElement
-                    );
-                }
-            });
+        if (badgesEnabled) {
+            createExternalBadges(
+                userId,
+                tags
+            )
+                .then(externalBadges => {
+                    if (
+                        externalBadges.children.length >
+                        0
+                    ) {
+                        message.insertBefore(
+                            externalBadges,
+                            usernameElement
+                        );
+                    }
+                });
+            }
     }
 
     if (fade != false) {
