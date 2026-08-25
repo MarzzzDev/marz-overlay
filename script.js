@@ -121,6 +121,9 @@ scale = Math.max(0.25, Math.min(scale, 3));
 
 document.documentElement.style.setProperty('--chat-scale', scale);
 
+const wrapEnabled =
+    params.get("wrap")?.toLowerCase() === "true";
+
 function saveTwitchAuth() {
     if (!accessToken) {
         return;
@@ -4365,6 +4368,10 @@ async function onMsg(
 
     message.className =
         "message";
+
+    if (wrapEnabled) {
+        message.classList.add("wrap-message");
+    }
 
     if (
         tags["custom-reward-id"]
