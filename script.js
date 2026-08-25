@@ -162,11 +162,11 @@ const badgesEnabled =
 
 let scale =
     Number(
-        overlaySettings.scale ?? 1
+        overlaySettings.scale ?? 0.5
     );
 
 if (!Number.isFinite(scale)) {
-    scale = 1;
+    scale = 0.5;
 }
 
 scale =
@@ -498,51 +498,62 @@ function showTwitchLoginScreen() {
         z-index: 999999;
 
         display: flex;
-        align-items: center;
-        justify-content: center;
 
-        padding: 20px;
-        box-sizing: border-box;
-
-        background:
-            #09090b;
+        background: #1f1f21;
+        color: #d8d8dc;
 
         font-family:
             Arial,
             Helvetica,
             sans-serif;
 
-        color: white;
+        overflow: hidden;
+    `;
+
+    const sidebar =
+        document.createElement("div");
+
+    sidebar.style.cssText = `
+        width: 292px;
+        min-width: 292px;
+        height: 100vh;
+
+        box-sizing: border-box;
+
+        padding: 76px 19px 18px;
+
+        background: #242426;
+
+        border-right:
+            1px solid #3a3a3e;
 
         overflow-y: auto;
     `;
 
-    const box =
+    const preview =
         document.createElement("div");
 
-    box.style.cssText = `
-        width: min(520px, 100%);
-        padding: 32px;
+    preview.style.cssText = `
+        flex: 1;
+        min-width: 0;
+        height: 100vh;
 
-        box-sizing: border-box;
-
-        background: #18181b;
-        border: 1px solid #27272a;
-        border-radius: 14px;
-
-
+        background: #1f1f21;
     `;
 
     const title =
         document.createElement("div");
 
     title.textContent =
-        "Marz' Overlay";
+        "Marz' Chat Overlay";
 
     title.style.cssText = `
-        font-size: 28px;
-        font-weight: 800;
-        margin-bottom: 8px;
+        font-size: 18px;
+        font-weight: 600;
+
+        color: #d8d8dc;
+
+        margin-bottom: 3px;
     `;
 
     const description =
@@ -552,22 +563,28 @@ function showTwitchLoginScreen() {
         "Configure your Twitch chat overlay.";
 
     description.style.cssText = `
-        font-size: 14px;
-        color: #a1a1aa;
-        margin-bottom: 26px;
+        font-size: 12px;
+
+        color: #a3a3a8;
+
+        margin-bottom: 16px;
     `;
 
     const channelLabel =
         document.createElement("label");
 
     channelLabel.textContent =
-        "Twitch channel";
+        "Twitch Channel";
 
     channelLabel.style.cssText = `
         display: block;
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 7px;
+
+        font-size: 12px;
+        font-weight: 500;
+
+        color: #d0d0d4;
+
+        margin-bottom: 6px;
     `;
 
     const channelInput =
@@ -590,47 +607,68 @@ function showTwitchLoginScreen() {
 
     channelInput.style.cssText = `
         width: 100%;
+        height: 30px;
+
         box-sizing: border-box;
 
-        padding: 12px 14px;
+        padding: 0 9px;
 
-        border: 1px solid #3f3f46;
+        border:
+            1px solid #3c3c41;
+
         border-radius: 7px;
 
-        background: #09090b;
-        color: white;
+        background: #1a1a1c;
+
+        color: #dedee2;
 
         outline: none;
 
-        font-size: 15px;
+        font-size: 12px;
     `;
+
+    channelInput.addEventListener(
+        "focus",
+        () => {
+            channelInput.style.borderColor =
+                "#8b4dcc";
+        }
+    );
+
+    channelInput.addEventListener(
+        "blur",
+        () => {
+            channelInput.style.borderColor =
+                "#3c3c41";
+        }
+    );
 
     const settingsTitle =
         document.createElement("div");
 
     settingsTitle.textContent =
-        "Overlay settings";
+        "Overlay Settings";
 
     settingsTitle.style.cssText = `
-        margin-top: 24px;
-        margin-bottom: 12px;
+        margin-top: 15px;
+        margin-bottom: 9px;
 
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 500;
+
+        color: #d0d0d4;
     `;
 
     const settings =
         document.createElement("div");
 
     settings.style.cssText = `
-        display: grid;
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-        gap: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
     `;
 
-    function createCheckbox(
+    function createToggle(
         label,
         key,
         checked
@@ -641,17 +679,18 @@ function showTwitchLoginScreen() {
         wrapper.style.cssText = `
             display: flex;
             align-items: center;
-            gap: 9px;
 
-            padding: 10px;
+            gap: 8px;
 
-            background: #09090b;
-            border: 1px solid #27272a;
-            border-radius: 7px;
+            height: 20px;
 
             cursor: pointer;
 
-            font-size: 13px;
+            font-size: 12px;
+
+            color: #d2d2d6;
+
+            user-select: none;
         `;
 
         const checkbox =
@@ -666,6 +705,80 @@ function showTwitchLoginScreen() {
         checkbox.dataset.setting =
             key;
 
+        checkbox.style.cssText = `
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        `;
+
+        const toggle =
+            document.createElement("span");
+
+        toggle.style.cssText = `
+            width: 33px;
+            height: 18px;
+
+            border-radius: 20px;
+
+            background:
+                ${checked
+                    ? "#8a4bc2"
+                    : "#55555a"};
+
+            position: relative;
+
+            flex-shrink: 0;
+
+            transition:
+                background .15s ease;
+        `;
+
+        const knob =
+            document.createElement("span");
+
+        knob.style.cssText = `
+            position: absolute;
+
+            width: 14px;
+            height: 14px;
+
+            border-radius: 50%;
+
+            background: #d9d9dd;
+
+            left: 2px;
+            top: 2px;
+
+            pointer-events: none;
+
+            transition:
+                transform .15s ease;
+        `;
+
+        knob.style.transform =
+            checked
+                ? "translateX(15px)"
+                : "translateX(0)";
+
+        toggle.appendChild(
+            knob
+        );
+
+        checkbox.addEventListener(
+            "change",
+            () => {
+                toggle.style.background =
+                    checkbox.checked
+                        ? "#8a4bc2"
+                        : "#55555a";
+
+                knob.style.transform =
+                    checkbox.checked
+                        ? "translateX(15px)"
+                        : "translateX(0)";
+            }
+        );
+
         const text =
             document.createElement("span");
 
@@ -674,6 +787,10 @@ function showTwitchLoginScreen() {
 
         wrapper.appendChild(
             checkbox
+        );
+
+        wrapper.appendChild(
+            toggle
         );
 
         wrapper.appendChild(
@@ -688,32 +805,48 @@ function showTwitchLoginScreen() {
     }
 
     const backgroundCheckbox =
-        createCheckbox(
+        createToggle(
             "Background",
             "background",
             backgroundEnabled
         );
 
-    const badgesCheckbox =
-        createCheckbox(
-            "Badges",
-            "badges",
-            badgesEnabled
-        );
-
     const wrapCheckbox =
-        createCheckbox(
+        createToggle(
             "Wrap messages",
             "wrap",
             wrapEnabled
         );
 
+    const badgesCheckbox =
+        createToggle(
+            "Badges",
+            "badges",
+            badgesEnabled
+        );
+
     const unlistedCheckbox =
-        createCheckbox(
+        createToggle(
             "Unlisted 7TV emotes",
             "unlisted",
             showUnlisted7TV
         );
+
+    const animationTitle =
+        document.createElement("div");
+
+    animationTitle.textContent =
+        "Animation & Scaling";
+
+    animationTitle.style.cssText = `
+        margin-top: 15px;
+        margin-bottom: 9px;
+
+        font-size: 12px;
+        font-weight: 500;
+
+        color: #d0d0d4;
+    `;
 
     const fadeLabel =
         document.createElement("label");
@@ -723,11 +856,13 @@ function showTwitchLoginScreen() {
 
     fadeLabel.style.cssText = `
         display: block;
-        margin-top: 18px;
-        margin-bottom: 7px;
 
-        font-size: 13px;
-        font-weight: 700;
+        margin-bottom: 6px;
+
+        font-size: 12px;
+        font-weight: 500;
+
+        color: #d0d0d4;
     `;
 
     const fadeInput =
@@ -755,56 +890,47 @@ function showTwitchLoginScreen() {
 
     fadeInput.style.cssText = `
         width: 100%;
+        height: 30px;
+
         box-sizing: border-box;
 
-        padding: 10px 12px;
+        padding: 0 9px;
 
-        border: 1px solid #3f3f46;
+        border:
+            1px solid #3c3c41;
+
         border-radius: 7px;
 
-        background: #09090b;
-        color: white;
+        background: #1a1a1c;
 
-        font-size: 14px;
-    `;
+        color: #dedee2;
 
-    const fadeNoCheckbox =
-        document.createElement("label");
-
-    fadeNoCheckbox.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        margin-top: 8px;
+        outline: none;
 
         font-size: 12px;
-        color: #a1a1aa;
+    `;
 
-        cursor: pointer;
+    const fadeNoWrapper =
+        document.createElement("div");
+
+    fadeNoWrapper.style.cssText = `
+        margin-top: 7px;
+        margin-bottom: 15px;
     `;
 
     const noFade =
-        document.createElement("input");
+        createToggle(
+            "Disable fading",
+            "disable-fading",
+            fade === false
+        );
 
-    noFade.type =
-        "checkbox";
-
-    noFade.checked =
-        fade === false;
-
-    fadeNoCheckbox.appendChild(
-        noFade
+    settings.removeChild(
+        noFade.parentElement
     );
 
-    const noFadeText =
-        document.createElement("span");
-
-    noFadeText.textContent =
-        "Disable fading";
-
-    fadeNoCheckbox.appendChild(
-        noFadeText
+    fadeNoWrapper.appendChild(
+        noFade.parentElement
     );
 
     noFade.addEventListener(
@@ -812,11 +938,21 @@ function showTwitchLoginScreen() {
         () => {
             fadeInput.disabled =
                 noFade.checked;
+
+            fadeInput.style.opacity =
+                noFade.checked
+                    ? ".45"
+                    : "1";
         }
     );
 
     fadeInput.disabled =
         noFade.checked;
+
+    if (noFade.checked) {
+        fadeInput.style.opacity =
+            ".45";
+    }
 
     const scaleLabel =
         document.createElement("label");
@@ -826,11 +962,13 @@ function showTwitchLoginScreen() {
 
     scaleLabel.style.cssText = `
         display: block;
-        margin-top: 18px;
-        margin-bottom: 7px;
 
-        font-size: 13px;
-        font-weight: 700;
+        margin-bottom: 6px;
+
+        font-size: 12px;
+        font-weight: 500;
+
+        color: #d0d0d4;
     `;
 
     const scaleInput =
@@ -853,17 +991,24 @@ function showTwitchLoginScreen() {
 
     scaleInput.style.cssText = `
         width: 100%;
+        height: 30px;
+
         box-sizing: border-box;
 
-        padding: 10px 12px;
+        padding: 0 9px;
 
-        border: 1px solid #3f3f46;
+        border:
+            1px solid #3c3c41;
+
         border-radius: 7px;
 
-        background: #09090b;
-        color: white;
+        background: #1a1a1c;
 
-        font-size: 14px;
+        color: #dedee2;
+
+        outline: none;
+
+        font-size: 12px;
     `;
 
     const error =
@@ -875,15 +1020,20 @@ function showTwitchLoginScreen() {
     error.style.cssText = `
         display: none;
 
-        margin-top: 12px;
-        padding: 10px 12px;
+        margin-top: 10px;
+        padding: 8px 9px;
 
-        background: rgba(239, 68, 68, .1);
-        border: 1px solid rgba(239, 68, 68, .3);
-        border-radius: 7px;
+        background:
+            rgba(239, 68, 68, .1);
+
+        border:
+            1px solid rgba(239, 68, 68, .3);
+
+        border-radius: 6px;
 
         color: #fca5a5;
-        font-size: 13px;
+
+        font-size: 11px;
     `;
 
     const button =
@@ -894,26 +1044,46 @@ function showTwitchLoginScreen() {
 
     button.textContent =
         accessToken
-            ? "Create overlay"
+            ? "Create Overlay"
             : "Authorize Twitch";
 
     button.style.cssText = `
         width: 100%;
+        height: 32px;
 
-        margin-top: 24px;
-        padding: 13px;
+        margin-top: 16px;
 
-        border: 0;
-        border-radius: 7px;
+        border: none;
+        border-radius: 4px;
 
-        background: #9147ff;
-        color: white;
+        background: #7c3fb2;
 
-        font-size: 15px;
-        font-weight: 700;
+        color: #f1edf5;
+
+        font-size: 12px;
+        font-weight: 500;
 
         cursor: pointer;
+
+        transition:
+            background .15s ease;
     `;
+
+    button.addEventListener(
+        "mouseenter",
+        () => {
+            button.style.background =
+                "#8b4fc2";
+        }
+    );
+
+    button.addEventListener(
+        "mouseleave",
+        () => {
+            button.style.background =
+                "#7c3fb2";
+        }
+    );
 
     const footer =
         document.createElement("div");
@@ -922,13 +1092,14 @@ function showTwitchLoginScreen() {
         "You will be redirected to Twitch to authorize the overlay.";
 
     footer.style.cssText = `
-        margin-top: 14px;
+        margin-top: 9px;
 
-        text-align: center;
+        padding: 0 3px;
 
-        color: #71717a;
-        font-size: 11px;
-        line-height: 1.5;
+        color: #929297;
+
+        font-size: 10px;
+        line-height: 1.4;
     `;
 
     button.addEventListener(
@@ -1030,23 +1201,77 @@ function showTwitchLoginScreen() {
         }
     );
 
-    box.appendChild(title);
-    box.appendChild(description);
-    box.appendChild(channelLabel);
-    box.appendChild(channelInput);
-    box.appendChild(settingsTitle);
-    box.appendChild(settings);
-    box.appendChild(fadeLabel);
-    box.appendChild(fadeInput);
-    box.appendChild(fadeNoCheckbox);
-    box.appendChild(scaleLabel);
-    box.appendChild(scaleInput);
-    box.appendChild(error);
-    box.appendChild(button);
-    box.appendChild(footer);
+    sidebar.appendChild(
+        title
+    );
 
-    screen.appendChild(box);
-    document.body.appendChild(screen);
+    sidebar.appendChild(
+        description
+    );
+
+    sidebar.appendChild(
+        channelLabel
+    );
+
+    sidebar.appendChild(
+        channelInput
+    );
+
+    sidebar.appendChild(
+        settingsTitle
+    );
+
+    sidebar.appendChild(
+        settings
+    );
+
+    sidebar.appendChild(
+        animationTitle
+    );
+
+    sidebar.appendChild(
+        fadeLabel
+    );
+
+    sidebar.appendChild(
+        fadeInput
+    );
+
+    sidebar.appendChild(
+        fadeNoWrapper
+    );
+
+    sidebar.appendChild(
+        scaleLabel
+    );
+
+    sidebar.appendChild(
+        scaleInput
+    );
+
+    sidebar.appendChild(
+        error
+    );
+
+    sidebar.appendChild(
+        button
+    );
+
+    sidebar.appendChild(
+        footer
+    );
+
+    screen.appendChild(
+        sidebar
+    );
+
+    screen.appendChild(
+        preview
+    );
+
+    document.body.appendChild(
+        screen
+    );
 }
 
 function showChannelError(message) {
