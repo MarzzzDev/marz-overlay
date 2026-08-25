@@ -4178,56 +4178,39 @@ function renderMessageText(
     return container;
 }
 
-function getReplyInfo(
-    tags,
-    msg
-) {
+function getReplyInfo(tags, msg) {
     const replyUsername =
-        tags[
-            "reply-parent-display-name"
-        ] ||
-        null;
+        tags["reply-parent-display-name"] || null;
 
     if (!replyUsername) {
-        return {
-            username:
-                null,
+        let cleanMessage = msg.trim();
 
-            message:
-                msg
+        if (tags["is-action"]) {
+            cleanMessage = cleanMessage.replace(/^ACTION /, "");
+        }
+
+        return {
+            username: null,
+            message: cleanMessage
         };
     }
 
-    let cleanMessage =
-        msg.trim();
+    let cleanMessage = msg.trim();
 
     const escapedUsername =
-        replyUsername.replace(
-            /[.*+?^${}()|[\]\\]/g,
-            "\\$&"
-        );
+        replyUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
     const replyPrefix =
-        new RegExp(
-            `^ACTION\\s+@${escapedUsername}\\s*`,
-            "i"
-        );
+        new RegExp(`^ACTION\\s+@${escapedUsername}\\s*`, "i");
 
     cleanMessage =
-        cleanMessage.replace(
-            replyPrefix,
-            ""
-        );
+        cleanMessage.replace(replyPrefix, "");
 
     return {
-        username:
-            replyUsername,
-
-        message:
-            cleanMessage
+        username: replyUsername,
+        message: cleanMessage
     };
 }
-
 function getTwitchDisplayColor(
     color
 ) {
@@ -5491,84 +5474,65 @@ function handleEventSubChatMessage(event) {
         return;
     }
 
-
     const username =
         event.chatter_user_name ||
         event.chatter_user_login ||
         "Unknown";
 
-
     const userId =
         event.chatter_user_id ||
         null;
 
-
     const usernameColor =
-        getTwitchDisplayColor(
-            event.color
-        );
-
+        getTwitchDisplayColor(event.color);
 
     const messageText =
-        event.message?.text ||
-        "";
+        event.message?.text || "";
+
+    const isAction =
+        messageText.startsWith("ACTION ");
 
     const emoteRanges =
         convertEventSubEmotes(
             event.message?.fragments,
-            messageText
+            messageText,
+            isAction ? 7 : 0
         );
-
 
     const badges =
-        convertEventSubBadges(
-            event.badges
-        );
-
+        convertEventSubBadges(event.badges);
 
     const tags = {
         badges,
 
-        emotes:
-            emoteRanges,
+        emotes: emoteRanges,
 
-        color:
-            event.color || "",
+        color: event.color || "",
 
-        "user-id":
-            userId,
+        "user-id": userId,
 
-        "display-name":
-            username,
+        "display-name": username,
 
-        "is-action":
-            event.message_type ===
-            "action",
+        "is-action": isAction,
+
         "custom-reward-id":
-            event.channel_points_custom_reward_id ||
-            "",
+            event.channel_points_custom_reward_id || "",
 
         "reply-parent-msg-id":
-            event.reply?.parent_message_id ||
-            "",
+            event.reply?.parent_message_id || "",
 
         "reply-parent-user-id":
-            event.reply?.parent_user_id ||
-            "",
+            event.reply?.parent_user_id || "",
 
         "reply-parent-user-login":
-            event.reply?.parent_user_login ||
-            "",
+            event.reply?.parent_user_login || "",
 
         "reply-parent-display-name":
-            event.reply?.parent_user_name ||
-            "",
+            event.reply?.parent_user_name || "",
 
         "reply-parent-msg-body":
-            event.reply?.parent_message_body ||
-            ""
+            event.reply?.parent_message_body || ""
     };
-
 
     try {
         onMsg(
@@ -5628,124 +5592,62 @@ function convertEventSubBadges(
 }
 
 
-function convertEventSubEmotes(
-    fragments,
-    text
-) {
-    if (
-        !Array.isArray(
-            fragments
-        ) ||
-        !text
-    ) {
+function convertEventSubEmotes(fragments, text, offset = 0) {
+    if (!Array.isArray(fragments) || !text) {
         return "";
     }
 
-
     const ranges = [];
-
     let cursor = 0;
 
-
-    for (
-        const fragment
-        of fragments
-    ) {
-        const fragmentText =
-            fragment?.text ||
-            "";
-
+    for (const fragment of fragments) {
+        const fragmentText = fragment?.text || "";
 
         if (!fragmentText) {
             continue;
         }
 
+        const start = text.indexOf(fragmentText, cursor);
 
-        const start =
-            text.indexOf(
-                fragmentText,
-                cursor
-            );
-
-
-        if (
-            start === -1
-        ) {
+        if (start === -1) {
             continue;
         }
 
+        const end = start + fragmentText.length - 1;
 
-        const end =
-            start +
-            fragmentText.length -
-            1;
-
-
-        if (
-            fragment.type ===
-            "emote"
-        ) {
-            const emoteId =
-                fragment.emote?.id;
-
+        if (fragment.type === "emote") {
+            const emoteId = fragment.emote?.id;
 
             if (emoteId) {
                 ranges.push({
-                    id:
-                        String(emoteId),
-
-                    start,
-
-                    end
+                    id: String(emoteId),
+                    start: start - offset,
+                    end: end - offset
                 });
             }
         }
 
-
-        cursor =
-            start +
-            fragmentText.length;
+        cursor = start + fragmentText.length;
     }
-
 
     if (!ranges.length) {
         return "";
     }
 
-    const grouped =
-        new Map();
+    const grouped = new Map();
 
-
-    for (
-        const range
-        of ranges
-    ) {
-        if (
-            !grouped.has(
-                range.id
-            )
-        ) {
-            grouped.set(
-                range.id,
-                []
-            );
+    for (const range of ranges) {
+        if (!grouped.has(range.id)) {
+            grouped.set(range.id, []);
         }
 
         grouped
             .get(range.id)
-            .push(
-                `${range.start}-${range.end}`
-            );
+            .push(`${range.start}-${range.end}`);
     }
 
-
-    return Array.from(
-        grouped.entries()
-    )
-        .map(
-            ([id, rangesForId]) =>
-                `${id}:${rangesForId.join(",")}`
-        )
+    return Array.from(grouped.entries())
+        .map(([id, rangesForId]) => `${id}:${rangesForId.join(",")}`)
         .join("/");
 }
 
