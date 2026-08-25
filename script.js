@@ -142,7 +142,7 @@ const selectedChannel =
         .toLowerCase()
         .replace(/^#/, "");
 
-const backgroundEnabled =
+let backgroundEnabled =
     overlaySettings.background === true;
 
 document.body.classList.toggle(
@@ -150,14 +150,14 @@ document.body.classList.toggle(
     backgroundEnabled
 );
 
-const fade =
+let fade =
     overlaySettings.fade === false
         ? false
         : Number(
             overlaySettings.fade ?? 15
         );
 
-const badgesEnabled =
+let badgesEnabled =
     overlaySettings.badges !== false;
 
 let scale =
@@ -180,10 +180,10 @@ document.documentElement.style.setProperty(
     scale
 );
 
-const wrapEnabled =
+let wrapEnabled =
     overlaySettings.wrap === true;
 
-const showUnlisted7TV =
+let showUnlisted7TV =
     overlaySettings.unlisted !== false;
 
 function saveTwitchAuth() {
@@ -476,6 +476,29 @@ async function ensureTwitchAuth() {
     return twitchAuthPromise;
 }
 
+const PREVIEW_CHANNEL = "marz_dev";
+
+async function loadPreviewEmotes() {
+    const previousChannel = CHANNEL;
+    CHANNEL = PREVIEW_CHANNEL;
+
+    await Promise.allSettled([
+        load7TVGlobalEmotes(),
+        loadFFZEmotes(),      // uses CHANNEL by name — works pre-auth
+        loadBTTVEmotes()      // global BTTV loads fine; channel BTTV needs an ID, skipped for now
+    ]);
+
+    CHANNEL = previousChannel;
+
+    renderPreviewSeedMessages();
+}
+
+function renderPreviewSeedMessages() {
+    addPreviewMessage("JamiMeow", "meow", "#ffffff", "458139207", "none");
+}
+
+loadPreviewEmotes();
+
 function showTwitchLoginScreen() {
     let screen =
         document.getElementById(
@@ -539,7 +562,37 @@ function showTwitchLoginScreen() {
         height: 100vh;
 
         background: #18181b;
+
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     `;
+
+    const previewChat =
+        document.createElement("div");
+
+    previewChat.id =
+        "chat-preview";
+
+    previewChat.style.cssText = `
+        flex: 1;
+        min-height: 0;
+
+        overflow-y: auto;
+
+        padding: 16px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;   /* NEW: messages sit at the bottom when few */
+        gap: 4px;
+    `;
+
+    preview.appendChild(previewChat);
+
+    addPreviewMessage("StreamFan22", "hello chat! Kappa", "#FF6B9D", null, {});
+    addPreviewMessage("Moderator_Sam", "welcome everyone to the stream", "#1E90FF", null, {});
+    addPreviewMessage("VIPuser", "is vibing", "#00C853", null, { "is-action": true });
 
     const title =
         document.createElement("div");
@@ -629,22 +682,6 @@ function showTwitchLoginScreen() {
         transition:
             border-color .15s ease;
     `;
-
-    channelInput.addEventListener(
-        "focus",
-        () => {
-            channelInput.style.borderColor =
-                "#9147ff";
-        }
-    );
-
-    channelInput.addEventListener(
-        "blur",
-        () => {
-            channelInput.style.borderColor =
-                "#46464f";
-        }
-    );
 
     const settingsTitle =
         document.createElement("div");
@@ -1013,6 +1050,114 @@ function showTwitchLoginScreen() {
 
         font-size: 12px;
     `;
+
+
+        backgroundCheckbox.addEventListener(
+        "change",
+        () => {
+            backgroundEnabled =
+                backgroundCheckbox.checked;
+
+            document.body.classList.toggle(
+                "has-background",
+                backgroundEnabled
+            );
+
+            previewChat.classList.toggle(
+                "has-background",
+                backgroundEnabled
+            );
+        }
+    );
+
+    wrapCheckbox.addEventListener(
+        "change",
+        () => {
+            wrapEnabled =
+                wrapCheckbox.checked;
+        }
+    );
+
+    badgesCheckbox.addEventListener(
+        "change",
+        () => {
+            badgesEnabled =
+                badgesCheckbox.checked;
+        }
+    );
+
+    unlistedCheckbox.addEventListener(
+        "change",
+        () => {
+            showUnlisted7TV =
+                unlistedCheckbox.checked;
+        }
+    );
+
+    fadeInput.addEventListener(
+        "input",
+        () => {
+            if (!noFade.checked) {
+                fade =
+                    Math.max(
+                        1,
+                        Number(fadeInput.value) || 15
+                    );
+            }
+        }
+    );
+
+    noFade.addEventListener(
+        "change",
+        () => {
+            fade =
+                noFade.checked
+                    ? false
+                    : Math.max(
+                        1,
+                        Number(fadeInput.value) || 15
+                    );
+        }
+    );
+
+    scaleInput.addEventListener(
+        "input",
+        () => {
+            let newScale =
+                Number(scaleInput.value);
+
+            if (!Number.isFinite(newScale)) {
+                return;
+            }
+
+            scale =
+                Math.max(
+                    0.25,
+                    Math.min(newScale, 3)
+                );
+
+            document.documentElement.style.setProperty(
+                "--chat-scale",
+                scale
+            );
+        }
+    );
+
+    channelInput.addEventListener(
+        "focus",
+        () => {
+            channelInput.style.borderColor =
+                "#9147ff";
+        }
+    );
+
+    channelInput.addEventListener(
+        "blur",
+        () => {
+            channelInput.style.borderColor =
+                "#46464f";
+        }
+    );
 
     const error =
         document.createElement("div");
@@ -5318,15 +5463,52 @@ function getTwitchDisplayColor(
     return hex;
 }
 
+function addPreviewMessage(
+    user,
+    msg,
+    usernameColor,
+    userId,
+    tags = {}
+) {
+    const previewChat =
+        document.getElementById(
+            "chat-preview"
+        );
+
+    if (!previewChat) {
+        return;
+    }
+
+    const result = onMsg(
+        user,
+        msg,
+        usernameColor,
+        userId,
+        tags,
+        previewChat
+    );
+
+    // NEW: keep the view pinned to the newest message
+    requestAnimationFrame(() => {
+        previewChat.scrollTop =
+            previewChat.scrollHeight;
+    });
+
+    return result;
+}
+
+window.addPreviewMessage = addPreviewMessage;
 
 async function onMsg(
     user,
     msg,
     usernameColor,
     userId,
-    tags
+    tags,
+    targetChat = null   // NEW: optional override
 ) {
     const chat =
+        targetChat ||
         document.getElementById(
             "chat"
         );
