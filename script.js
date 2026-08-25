@@ -2632,13 +2632,12 @@ function createPaintDropShadowFilter(paint) {
         }
     }
 
-    const fallbackColor =
-        getPaintFallbackColor(paint);
-
-    return (
-        `drop-shadow(0px 0px 6px ${fallbackColor}) ` +
-        `drop-shadow(0px 0px 2px ${fallbackColor})`
-    );
+    // A paint without its own 7TV shadows must use the same normal
+    // username shadow as an unpainted username. This is deliberately
+    // returned as text-shadow because the painted text uses a transparent
+    // fill/background clip; applying drop-shadow to that element can result
+    // in no visible shadow at all.
+    return "__NORMAL_USERNAME_SHADOW__";
 }
 
 function getPaintFallbackColor(paint) {
@@ -3040,11 +3039,21 @@ async function applyPaint(
         );
 
     if (
+        shadowFilter ===
+        "__NORMAL_USERNAME_SHADOW__"
+    ) {
+        element.style.filter =
+            "none";
+        element.style.textShadow =
+            "1px 1px 2px rgba(0, 0, 0, 0.85)";
+    } else if (
         shadowFilter &&
         shadowFilter !== "none"
     ) {
         element.style.filter =
             shadowFilter;
+        element.style.textShadow =
+            "none";
     }
 
     element.style.backgroundOrigin =
