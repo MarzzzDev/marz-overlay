@@ -16,6 +16,7 @@ A feature-packed chat overlay built with customization in mind, bringing effects
 | `background` | Enable/disable the background (default = false)                  |
 | `fade`       | Configure fade effects (default = 15; false = no fade)           |
 | `badges`     | Display supported badges (default = true)                        |
+| `scale`      | Change scale of chat messages (default = 1)                      |
 
 > **Marz' Overlay** aims to provide a highly customizable chat experience with features you won't find in many other chat overlays.
 > **Features coming soon:** easy customization with previews, cheer animations..
