@@ -4,7 +4,9 @@ body {
     height: 100vh;
     position: relative;
     flex-direction: column;
+
     background: transparent;
+
     font-family: 'Open Sans', sans-serif;
 }
 
@@ -14,19 +16,29 @@ body {
 
 .message {
     display: block;
+
     width: auto;
     max-width: 98%;
+
     box-sizing: border-box;
+
     margin-top: 0;
     margin-bottom: 3px;
+
     padding: 2px 12px 7px 12px;
+
     min-height: 74px;
+
     line-height: 65px;
     border-radius: 14px;
+
     background: transparent;
+
     border-left: none;
     box-shadow: none;
+
     animation: messageIn 0.25s ease-out forwards;
+
     white-space: normal;
     overflow-wrap: normal;
     word-break: normal;
@@ -45,7 +57,6 @@ body {
     flex: none;
     margin: 0;
 }
-
 body.has-background .message {
     background: linear-gradient(
         90deg,
@@ -87,18 +98,24 @@ body.has-background .message.redeem-message:hover {
     width: 100%;
     box-sizing: border-box;
     padding: 18px;
+
     position: absolute;
     bottom: 0;
     left: 0;
+
     overflow: hidden;
+
     color: white;
     font-weight: 900;
+
     word-break: normal;
     overflow-wrap: normal;
     white-space: normal;
+
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+
     zoom: var(--chat-scale);
 }
 
@@ -132,19 +149,23 @@ body.has-background .message.redeem-message:hover {
     display: inline-flex;
     align-items: center;
     vertical-align: middle;
+
     gap: 3px;
     margin-right: 6px;
+
     position: relative;
     top: 0;
 }
-
 .badge {
     width: 45px;
     height: 45px;
+
     min-width: 45px;
     min-height: 45px;
+
     max-width: 45px;
     max-height: 45px;
+
     object-fit: contain;
     display: block;
 
@@ -157,22 +178,26 @@ body.has-background .message.redeem-message:hover {
 .username {
     font-size: 50px;
     font-weight: 900;
+
     margin-right: 5px;
+
     display: inline;
     position: relative;
+
     line-height: 65px;
     vertical-align: middle;
+
     max-width: none;
     min-width: 0;
+
     overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
 
-    -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.9);
-
     filter:
-        drop-shadow(2px 2px 0.2rem rgba(0, 0, 0, 0.95))
-        drop-shadow(0 0 3px rgba(255, 255, 255, 0.12));
+        drop-shadow(2px 3px 0.22rem rgba(0, 0, 0, 1))
+        drop-shadow(0 0 5px rgba(0, 0, 0, 0.75))
+        drop-shadow(0 0 3px rgba(255, 255, 255, 0.14));
 
     -webkit-background-clip: text;
     background-clip: text;
@@ -183,24 +208,28 @@ body.has-background .message.redeem-message:hover {
 
 .text {
     color: #ffffff;
+
     font-size: 50px;
     font-weight: 900;
     letter-spacing: 0.2px;
+
     display: inline;
+
     line-height: 65px;
     vertical-align: middle;
+
     width: auto;
     max-width: none;
     min-width: 0;
+
     overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
 
-    -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.9);
-
     filter:
-        drop-shadow(2px 2px 0.2rem rgba(0, 0, 0, 0.95))
-        drop-shadow(0 0 3px rgba(255, 255, 255, 0.12));
+        drop-shadow(2px 3px 0.22rem rgba(0, 0, 0, 1))
+        drop-shadow(0 0 5px rgba(0, 0, 0, 0.75))
+        drop-shadow(0 0 3px rgba(255, 255, 255, 0.14));
 
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
@@ -209,9 +238,13 @@ body.has-background .message.redeem-message:hover {
 .emote {
     height: 65px;
     width: auto;
+
     object-fit: contain;
+
     vertical-align: middle;
+
     margin: 0 3px;
+
     flex: 0 0 auto;
 
     filter:
@@ -224,9 +257,13 @@ body.has-background .message.redeem-message:hover {
 .twemoji {
     height: 65px;
     width: auto;
+
     object-fit: contain;
+
     vertical-align: middle;
+
     margin: 0 3px;
+
     flex: 0 0 auto;
 
     filter:
@@ -259,9 +296,13 @@ body.has-background .message.redeem-message:hover {
 
 .reply-to {
     opacity: 0.65;
+
     margin-right: 4px;
+
     font-size: 0.9em;
+
     max-width: 100%;
+
     overflow-wrap: anywhere;
     word-break: break-word;
 }
