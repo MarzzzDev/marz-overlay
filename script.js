@@ -4179,38 +4179,31 @@ function renderMessageText(
 }
 
 function getReplyInfo(tags, msg) {
-    const replyUsername =
-        tags["reply-parent-display-name"] || null;
+    const replyUsername = tags["reply-parent-display-name"] || null;
 
     if (!replyUsername) {
         let cleanMessage = msg.trim();
 
         if (tags["is-action"]) {
-            cleanMessage = cleanMessage.replace(/^ACTION /, "");
+            cleanMessage = cleanMessage
+                .replace(/^\x01?ACTION /, "")
+                .replace(/\x01$/, "");
         }
 
-        return {
-            username: null,
-            message: cleanMessage
-        };
+        return { username: null, message: cleanMessage };
     }
 
     let cleanMessage = msg.trim();
+    const escapedUsername = replyUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const replyPrefix = new RegExp(`^\\x01?ACTION\\s+@${escapedUsername}\\s*`, "i");
 
-    const escapedUsername =
-        replyUsername.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    cleanMessage = cleanMessage
+        .replace(replyPrefix, "")
+        .replace(/\x01$/, "");
 
-    const replyPrefix =
-        new RegExp(`^ACTION\\s+@${escapedUsername}\\s*`, "i");
-
-    cleanMessage =
-        cleanMessage.replace(replyPrefix, "");
-
-    return {
-        username: replyUsername,
-        message: cleanMessage
-    };
+    return { username: replyUsername, message: cleanMessage };
 }
+
 function getTwitchDisplayColor(
     color
 ) {
@@ -5470,88 +5463,44 @@ async function subscribeToChat() {
 }
 
 function handleEventSubChatMessage(event) {
-    if (!event) {
-        return;
-    }
+    if (!event) return;
 
-    const username =
-        event.chatter_user_name ||
-        event.chatter_user_login ||
-        "Unknown";
+    const username = event.chatter_user_name || event.chatter_user_login || "Unknown";
+    const userId = event.chatter_user_id || null;
+    const usernameColor = getTwitchDisplayColor(event.color);
 
-    const userId =
-        event.chatter_user_id ||
-        null;
+    const rawText = event.message?.text || "";
+    const actionMatch = rawText.match(/^\x01?ACTION /);
+    const isAction = Boolean(actionMatch);
+    const actionPrefixLength = actionMatch ? actionMatch[0].length : 0;
 
-    const usernameColor =
-        getTwitchDisplayColor(event.color);
+    const emoteRanges = convertEventSubEmotes(
+        event.message?.fragments,
+        rawText,
+        actionPrefixLength
+    );
 
-    const messageText =
-        event.message?.text || "";
-
-    const isAction =
-        messageText.startsWith("ACTION ");
-
-    const emoteRanges =
-        convertEventSubEmotes(
-            event.message?.fragments,
-            messageText,
-            isAction ? 7 : 0
-        );
-
-    const badges =
-        convertEventSubBadges(event.badges);
+    const badges = convertEventSubBadges(event.badges);
 
     const tags = {
         badges,
-
         emotes: emoteRanges,
-
         color: event.color || "",
-
         "user-id": userId,
-
         "display-name": username,
-
         "is-action": isAction,
-
-        "custom-reward-id":
-            event.channel_points_custom_reward_id || "",
-
-        "reply-parent-msg-id":
-            event.reply?.parent_message_id || "",
-
-        "reply-parent-user-id":
-            event.reply?.parent_user_id || "",
-
-        "reply-parent-user-login":
-            event.reply?.parent_user_login || "",
-
-        "reply-parent-display-name":
-            event.reply?.parent_user_name || "",
-
-        "reply-parent-msg-body":
-            event.reply?.parent_message_body || ""
+        "custom-reward-id": event.channel_points_custom_reward_id || "",
+        "reply-parent-msg-id": event.reply?.parent_message_id || "",
+        "reply-parent-user-id": event.reply?.parent_user_id || "",
+        "reply-parent-user-login": event.reply?.parent_user_login || "",
+        "reply-parent-display-name": event.reply?.parent_user_name || "",
+        "reply-parent-msg-body": event.reply?.parent_message_body || ""
     };
 
     try {
-        onMsg(
-            username,
-            messageText,
-            usernameColor,
-            userId,
-            tags
-        );
-
+        onMsg(username, rawText, usernameColor, userId, tags);
     } catch (error) {
-        console.error(
-            "Message rendering error:",
-            error,
-            {
-                username,
-                messageText
-            }
-        );
+        console.error("Message rendering error:", error, { username, rawText });
     }
 }
 
