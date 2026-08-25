@@ -195,8 +195,9 @@ body.has-background .message.redeem-message:hover {
     white-space: normal;
 
     filter:
-        drop-shadow(0 0 2px rgba(255, 255, 255, 0.25))
-        drop-shadow(2px 3px 3px rgba(0, 0, 0, 0.8));
+        drop-shadow(2px 3px 0.22rem rgba(0, 0, 0, 1))
+        drop-shadow(0 0 5px rgba(0, 0, 0, 0.75))
+        drop-shadow(0 0 3px rgba(255, 255, 255, 0.14));
 
     -webkit-background-clip: text;
     background-clip: text;
@@ -226,8 +227,9 @@ body.has-background .message.redeem-message:hover {
     white-space: normal;
 
     filter:
-        drop-shadow(2 2px 2px rgba(0, 0, 0, 0.95))
-        drop-shadow(0 0 3px rgba(255, 255, 255, 0.12));
+        drop-shadow(2px 3px 0.22rem rgba(0, 0, 0, 1))
+        drop-shadow(0 0 5px rgba(0, 0, 0, 0.75))
+        drop-shadow(0 0 3px rgba(255, 255, 255, 0.14));
 
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
