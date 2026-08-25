@@ -476,28 +476,52 @@ async function ensureTwitchAuth() {
     return twitchAuthPromise;
 }
 
-const PREVIEW_CHANNEL = "marz_dev";
-
 async function loadPreviewEmotes() {
     const previousChannel = CHANNEL;
+    const previousUserId = TWITCH_USER_ID;
+
     CHANNEL = PREVIEW_CHANNEL;
+    TWITCH_USER_ID = PREVIEW_TWITCH_USER_ID;
 
     await Promise.allSettled([
         load7TVGlobalEmotes(),
-        loadFFZEmotes(),      // uses CHANNEL by name — works pre-auth
-        loadBTTVEmotes()      // global BTTV loads fine; channel BTTV needs an ID, skipped for now
+        load7TVEmotes(),
+        loadFFZEmotes(),
+        loadBTTVEmotes()
     ]);
 
     CHANNEL = previousChannel;
+    TWITCH_USER_ID = previousUserId;
 
-    renderPreviewSeedMessages();
 }
 
-function renderPreviewSeedMessages() {
-    addPreviewMessage("JamiMeow", "meow", "#ffffff", "458139207", "none");
+const PREVIEW_CHANNEL = "marz_dev";
+const PREVIEW_TWITCH_USER_ID = "458139207";
+
+const previewMessages = [
+    ["waustas", "Reacting wow this overlay sure is cool!", "#ffffff", "507853201", "none"],
+    ["JamiMeow", "hesRight ffzBounce", "#ffffff", "458139207", "none"],
+    ["marz_dev", "wowie an overlay with support for ffz effects", "#FF0000", "1208634685", "none"],
+    ["eyemLeonard", "Maybe I should use it", "#FF0000", "1071801594", "none"],
+    ["Underpaid_Actor", "i am underpaid and i am a dumbass", "#FF0000", "406239629", "none"],
+    ["Dodorej", "订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK ", "#FF0000", "504585840", "none"]
+];
+
+let currentPreviewMessage = 0;
+
+function runPreviewMessage() {
+    const message = previewMessages[currentPreviewMessage];
+
+    addPreviewMessage(...message);
+
+    currentPreviewMessage =
+        (currentPreviewMessage + 1) % previewMessages.length;
+
+    const delay = Math.random() * 1000 + 3000;
+
+    setTimeout(runPreviewMessage, delay);
 }
 
-loadPreviewEmotes();
 
 function showTwitchLoginScreen() {
     let screen =
@@ -568,31 +592,58 @@ function showTwitchLoginScreen() {
         overflow: hidden;
     `;
 
-    const previewChat =
-        document.createElement("div");
+    let previewChat =
+        document.getElementById("chat");
 
-    previewChat.id =
-        "chat-preview";
+    if (!previewChat) {
+        previewChat =
+            document.createElement("div");
 
-    previewChat.style.cssText = `
-        flex: 1;
-        min-height: 0;
+        previewChat.id = "chat";
+    }
 
-        overflow-y: auto;
+    previewChat.dataset.originalPosition =
+        previewChat.style.position || "";
+    previewChat.dataset.originalInset =
+        previewChat.style.inset || "";
+    previewChat.dataset.originalTop =
+        previewChat.style.top || "";
+    previewChat.dataset.originalLeft =
+        previewChat.style.left || "";
+    previewChat.dataset.originalRight =
+        previewChat.style.right || "";
+    previewChat.dataset.originalBottom =
+        previewChat.style.bottom || "";
+    previewChat.dataset.originalWidth =
+        previewChat.style.width || "";
+    previewChat.dataset.originalHeight =
+        previewChat.style.height || "";
+    previewChat.dataset.originalZIndex =
+        previewChat.style.zIndex || "";
 
-        padding: 16px;
 
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;   /* NEW: messages sit at the bottom when few */
-        gap: 4px;
-    `;
+    previewChat.style.position = "relative";
+    previewChat.style.inset = "auto";
+    previewChat.style.top = "auto";
+    previewChat.style.left = "auto";
+    previewChat.style.right = "auto";
+    previewChat.style.bottom = "auto";
+    previewChat.style.width = "100%";  
+    previewChat.style.height = "auto";
+    previewChat.style.zIndex = "auto";
+
+    previewChat.style.flex = "1";
+    previewChat.style.minHeight = "0";
+    previewChat.style.overflowY = "auto";
+    previewChat.style.display = "flex";
+    previewChat.style.flexDirection = "column";
+    previewChat.style.justifyContent = "flex-end";
+
+    previewChat.innerHTML = "";
 
     preview.appendChild(previewChat);
 
-    addPreviewMessage("StreamFan22", "hello chat! Kappa", "#FF6B9D", null, {});
-    addPreviewMessage("Moderator_Sam", "welcome everyone to the stream", "#1E90FF", null, {});
-    addPreviewMessage("VIPuser", "is vibing", "#00C853", null, { "is-action": true });
+    loadPreviewEmotes();
 
     const title =
         document.createElement("div");
@@ -1556,7 +1607,10 @@ function showTwitchLoginScreen() {
     document.body.appendChild(
         screen
     );
+    runPreviewMessage();
 }
+
+
 
 function showChannelError(message) {
     const screen =
@@ -1588,11 +1642,56 @@ function hideTwitchLoginScreen() {
             "twitch-login-screen"
         );
 
-    if (screen) {
-        screen.remove();
+    if (!screen) {
+        return;
     }
-}
 
+    const chat =
+        document.getElementById("chat");
+
+    if (chat && screen.contains(chat)) {
+        chat.style.position =
+            chat.dataset.originalPosition || "";
+        chat.style.inset =
+            chat.dataset.originalInset || "";
+        chat.style.top =
+            chat.dataset.originalTop || "";
+        chat.style.left =
+            chat.dataset.originalLeft || "";
+        chat.style.right =
+            chat.dataset.originalRight || "";
+        chat.style.bottom =
+            chat.dataset.originalBottom || "";
+        chat.style.width =
+            chat.dataset.originalWidth || "";
+        chat.style.height =
+            chat.dataset.originalHeight || "";
+        chat.style.zIndex =
+            chat.dataset.originalZIndex || "";
+
+        chat.style.flex = "";
+        chat.style.minHeight = "";
+        chat.style.overflowY = "";
+
+        delete chat.dataset.originalPosition;
+        delete chat.dataset.originalInset;
+        delete chat.dataset.originalTop;
+        delete chat.dataset.originalLeft;
+        delete chat.dataset.originalRight;
+        delete chat.dataset.originalBottom;
+        delete chat.dataset.originalWidth;
+        delete chat.dataset.originalHeight;
+        delete chat.dataset.originalZIndex;
+
+        chat.style.display = "";
+        chat.style.flexDirection = "";
+        chat.style.justifyContent = "";
+
+        document.body.appendChild(chat);
+    }
+
+    screen.remove();
+}
 async function get7TVColor(userId) {
     if (!userId) {
         return null;
@@ -5471,9 +5570,7 @@ function addPreviewMessage(
     tags = {}
 ) {
     const previewChat =
-        document.getElementById(
-            "chat-preview"
-        );
+        document.getElementById("chat");   // FIXED
 
     if (!previewChat) {
         return;
@@ -5488,7 +5585,6 @@ function addPreviewMessage(
         previewChat
     );
 
-    // NEW: keep the view pinned to the newest message
     requestAnimationFrame(() => {
         previewChat.scrollTop =
             previewChat.scrollHeight;
@@ -5505,7 +5601,7 @@ async function onMsg(
     usernameColor,
     userId,
     tags,
-    targetChat = null   // NEW: optional override
+    targetChat = null
 ) {
     const chat =
         targetChat ||
