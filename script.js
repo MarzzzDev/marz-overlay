@@ -124,6 +124,9 @@ document.documentElement.style.setProperty('--chat-scale', scale);
 const wrapEnabled =
     params.get("wrap")?.toLowerCase() === "true";
 
+const showUnlisted7TV =
+    params.get("unlisted")?.toLowerCase() !== "false";
+
 function saveTwitchAuth() {
     if (!accessToken) {
         return;
@@ -732,6 +735,9 @@ function add7TVEmote(emote) {
                 "7TV",
 
             flags,
+
+            listed:
+                emote.listed !== false,
 
             zeroWidth:
                 Boolean(
@@ -3649,11 +3655,20 @@ function findThirdPartyEmote(word) {
             word
         )
     ) {
-        return {
-            ...sevenTVEmotes.get(
+        const emote =
+            sevenTVEmotes.get(
                 word
-            ),
+            );
 
+        if (
+            !showUnlisted7TV &&
+            emote.listed === false
+        ) {
+            return null;
+        }
+
+        return {
+            ...emote,
             provider:
                 "7TV"
         };
