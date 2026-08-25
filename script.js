@@ -717,6 +717,11 @@ function add7TVEmote(emote) {
     const flags =
         get7TVEmoteFlags(emote);
 
+    const listed =
+        emote?.data?.listed ??
+        emote?.listed ??
+        true;
+
     sevenTVEmotes.set(
         emote.name,
         {
@@ -737,7 +742,7 @@ function add7TVEmote(emote) {
             flags,
 
             listed:
-                emote.listed !== false,
+                listed !== false,
 
             zeroWidth:
                 Boolean(
