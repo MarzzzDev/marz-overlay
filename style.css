@@ -10,6 +10,10 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
+:root {
+    --chat-scale: 1;
+}
+
 .message {
     display: flex;
     align-items: center;
@@ -83,13 +87,10 @@ body.has-background .message.redeem-message:hover {
         0 0 18px rgba(40, 120, 255, 0.25);
 }
 
-:root {
-    --chat-scale: 1;
-}
-
 #chat {
     width: 100%;
     box-sizing: border-box;
+    padding: 18px;
 
     position: absolute;
     bottom: 0;
@@ -100,12 +101,15 @@ body.has-background .message.redeem-message:hover {
     color: white;
     font-weight: 900;
 
-    transform: scale(var(--chat-scale));
-    transform-origin: bottom left;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: normal;
 
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+
+    zoom: var(--chat-scale);
 }
 
 @keyframes messageIn {
@@ -119,7 +123,6 @@ body.has-background .message.redeem-message:hover {
         transform: translateX(0) scale(1);
     }
 }
-
 
 @keyframes messageFadeOut {
     from {
@@ -149,7 +152,6 @@ body.has-background .message.redeem-message:hover {
 
     flex: 0 0 auto;
 }
-
 
 .badge {
     width: 45px;
@@ -246,7 +248,6 @@ body.has-background .message.redeem-message:hover {
     transition: transform 0.15s ease;
 }
 
-
 .twemoji {
     height: 65px;
     width: auto;
@@ -275,7 +276,6 @@ body.has-background .message.redeem-message:hover {
         scaleY(var(--ffz-scale-y, 1));
 }
 
-
 .emote:hover {
     transform: scale(1.08);
 }
@@ -283,7 +283,6 @@ body.has-background .message.redeem-message:hover {
 .external-badges {
     margin-left: 2px;
 }
-
 
 .twitch-badges {
     margin-right: 5px;

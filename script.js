@@ -115,7 +115,9 @@ const fade = fadeParam?.toLowerCase() === "false"
 const badgesEnabled =
     params.get("badges")?.toLowerCase() !== "false";
 
-const scale = parseFloat(params.get('scale')) || 1;
+let scale = parseFloat(params.get('scale')) || 1;
+
+scale = Math.max(0.25, Math.min(scale, 3));
 
 document.documentElement.style.setProperty('--chat-scale', scale);
 
