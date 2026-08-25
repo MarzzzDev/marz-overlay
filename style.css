@@ -83,10 +83,13 @@ body.has-background .message.redeem-message:hover {
         0 0 18px rgba(40, 120, 255, 0.25);
 }
 
+:root {
+    --chat-scale: 1;
+}
+
 #chat {
-    width: 200%;
+    width: 100%;
     box-sizing: border-box;
-    padding: 18px;
 
     position: absolute;
     bottom: 0;
@@ -97,11 +100,7 @@ body.has-background .message.redeem-message:hover {
     color: white;
     font-weight: 900;
 
-    word-break: normal;
-    overflow-wrap: normal;
-    white-space: normal;
-
-    transform: scale(0.5);
+    transform: scale(var(--chat-scale));
     transform-origin: bottom left;
 
     display: flex;
