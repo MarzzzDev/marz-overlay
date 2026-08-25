@@ -15,15 +15,12 @@ body {
 }
 
 .message {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    display: block;
 
-    width: fit-content;
+    width: auto;
     max-width: 98%;
 
     box-sizing: border-box;
-    flex: 0 1 auto;
 
     margin-top: 0;
     margin-bottom: 3px;
@@ -32,37 +29,34 @@ body {
 
     min-height: 74px;
 
-    line-height: 30px;
+    line-height: 65px;
     border-radius: 14px;
 
     background: transparent;
 
     border-left: none;
-
     box-shadow: none;
 
     animation: messageIn 0.25s ease-out forwards;
 
-    overflow-wrap: anywhere;
-    word-break: break-word;
     white-space: normal;
-
-    min-width: 0;
+    overflow-wrap: normal;
+    word-break: normal;
 }
 
 .message.wrap-message {
-    width: 98%;
+    width: auto;
     max-width: 98%;
 }
 
 .message.wrap-message .text {
-    flex: 1 1 100%;
-    width: 100%;
-    max-width: 100%;
+    display: inline;
+    width: auto;
+    max-width: none;
     min-width: 0;
-    display: block;
+    flex: none;
+    margin: 0;
 }
-
 body.has-background .message {
     background: linear-gradient(
         90deg,
@@ -159,13 +153,9 @@ body.has-background .message.redeem-message:hover {
     gap: 3px;
     margin-right: 6px;
 
-    transform: none;
     position: relative;
     top: 0;
-
-    flex: 0 0 auto;
 }
-
 .badge {
     width: 45px;
     height: 45px;
@@ -191,17 +181,17 @@ body.has-background .message.redeem-message:hover {
 
     margin-right: 5px;
 
-    display: inline-block;
+    display: inline;
     position: relative;
 
     line-height: 65px;
     vertical-align: middle;
 
-    max-width: 100%;
+    max-width: none;
     min-width: 0;
 
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: normal;
+    word-break: normal;
     white-space: normal;
 
     filter:
@@ -224,14 +214,15 @@ body.has-background .message.redeem-message:hover {
 
     display: inline;
 
-    line-height: normal;
+    line-height: 65px;
     vertical-align: middle;
 
-    max-width: 100%;
+    width: auto;
+    max-width: none;
     min-width: 0;
 
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: normal;
+    word-break: normal;
     white-space: normal;
 
     filter:
@@ -240,15 +231,6 @@ body.has-background .message.redeem-message:hover {
 
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
-}
-
-.message.wrap-message .text {
-    flex: 1 1 100%;
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    margin-top: 0;
 }
 
 .emote {
