@@ -628,7 +628,7 @@ function showTwitchLoginScreen() {
     previewChat.style.left = "auto";
     previewChat.style.right = "auto";
     previewChat.style.bottom = "auto";
-    previewChat.style.width = "100%";  
+    previewChat.style.width = "98%";  
     previewChat.style.height = "auto";
     previewChat.style.zIndex = "auto";
 
@@ -3037,7 +3037,6 @@ async function applyPaint(
         createPaintDropShadowFilter(
             paint
         );
-
     if (
         shadowFilter ===
         "__NORMAL_USERNAME_SHADOW__"
@@ -3045,7 +3044,7 @@ async function applyPaint(
         element.style.filter =
             "none";
         element.style.textShadow =
-            "1px 1px 2px rgba(0, 0, 0, 0.85)";
+            "1px 1px 2px rgba(0, 0, 0, 0.9), 0 0 6px rgba(0, 0, 0, 0.6)";
     } else if (
         shadowFilter &&
         shadowFilter !== "none"
