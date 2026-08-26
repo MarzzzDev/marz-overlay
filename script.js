@@ -2631,13 +2631,7 @@ function createPaintDropShadowFilter(paint) {
             return filters.join(" ");
         }
     }
-
-    // A paint without its own 7TV shadows must use the same normal
-    // username shadow as an unpainted username. This is deliberately
-    // returned as text-shadow because the painted text uses a transparent
-    // fill/background clip; applying drop-shadow to that element can result
-    // in no visible shadow at all.
-    return "__NORMAL_USERNAME_SHADOW__";
+    return null;
 }
 
 function getPaintFallbackColor(paint) {
