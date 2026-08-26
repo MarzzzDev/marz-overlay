@@ -13,16 +13,14 @@ body {
 }
 
 .message {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    display: block;
     width: auto;
     max-width: 98%;
     box-sizing: border-box;
     margin: 0 0 3px 0;
-    padding: 0px 5px;
-    gap: 5px;
+    padding: 2px 12px 7px 12px;
     min-height: 74px;
+    line-height: 68px;
     border-radius: 14px;
     background: transparent;
     border-left: none;
@@ -130,45 +128,35 @@ body.has-background .message.redeem-message:hover {
 }
 
 .badges {
-    display: flex;
-    flex-direction: row;
+    display: inline-flex;
     align-items: center;
     vertical-align: middle;
-    padding: 0px 5px;
-    gap: 5px;
-    width: 100px;
-    height: 46px;
-    margin-right: 0;
+    gap: 3px;
+    margin-right: 6px;
     position: relative;
     top: 0;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
-    flex: none;
-    order: 0;
-    flex-grow: 0;
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
 }
 
 .badge {
     width: 45px;
-    height: 46px;
+    height: 45px;
     min-width: 45px;
-    min-height: 46px;
+    min-height: 45px;
     max-width: 45px;
-    max-height: 46px;
+    max-height: 45px;
     object-fit: contain;
     display: block;
     flex: 0 0 auto;
 }
 
 .username {
-    width: 251px;
-    height: 68px;
     font-family: 'Open Sans', sans-serif;
     font-style: normal;
     font-size: 50px;
     font-weight: 900;
     margin-right: 5px;
-    display: flex;
-    align-items: center;
+    display: inline;
     position: relative;
     line-height: 68px;
     vertical-align: middle;
@@ -178,14 +166,11 @@ body.has-background .message.redeem-message:hover {
     word-break: normal;
     white-space: normal;
     color: #FF0000;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
     -webkit-background-clip: text;
     background-clip: text;
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
 }
 
 .text {
@@ -204,12 +189,9 @@ body.has-background .message.redeem-message:hover {
     overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
-    flex: none;
-    order: 3;
-    flex-grow: 0;
 }
 
 .emote,
@@ -220,9 +202,8 @@ body.has-background .message.redeem-message:hover {
     vertical-align: middle;
     margin: 0 3px;
     flex: 0 0 auto;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
     transition: transform 0.15s ease;
-    order: 2;
 }
 
 .emote.ffz-effect-transform {
