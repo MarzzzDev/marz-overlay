@@ -135,7 +135,7 @@ body.has-background .message.redeem-message:hover {
     margin-right: 6px;
     position: relative;
     top: 0;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.85)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
 }
 
 .badge {
@@ -166,7 +166,7 @@ body.has-background .message.redeem-message:hover {
     word-break: normal;
     white-space: normal;
     color: #FF0000;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.85)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
     -webkit-background-clip: text;
     background-clip: text;
     text-rendering: geometricPrecision;
@@ -189,7 +189,7 @@ body.has-background .message.redeem-message:hover {
     overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.85)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
 }
@@ -202,7 +202,7 @@ body.has-background .message.redeem-message:hover {
     vertical-align: middle;
     margin: 0 3px;
     flex: 0 0 auto;
-    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.85)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
     transition: transform 0.15s ease;
 }
 
