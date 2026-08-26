@@ -71,7 +71,7 @@ body.has-background .message.redeem-message {
 
     box-shadow:
         0 4px 14px rgba(0, 0, 0, 0.45),
-        inset 0 0 18px rgba(70, 150, 255, 0.18),
+        inset 0 0 20px rgba(70, 150, 255, 0.18),
         0 0 12px rgba(40, 120, 255, 0.18);
 }
 
@@ -146,7 +146,7 @@ body.has-background .message.redeem-message:hover {
     max-height: 45px;
     object-fit: contain;
     display: block;
-    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.35));
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
     flex: 0 0 auto;
 }
 
@@ -163,9 +163,7 @@ body.has-background .message.redeem-message:hover {
     overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
-    filter:
-        drop-shadow(2px 2px 0.2rem rgba(0, 0, 0, 0.95))
-        drop-shadow(0 0 3px rgba(255, 255, 255, 0.12));
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
     -webkit-background-clip: text;
     background-clip: text;
     text-rendering: geometricPrecision;
@@ -186,9 +184,7 @@ body.has-background .message.redeem-message:hover {
     overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
-    filter:
-        drop-shadow(2px 2px 0.2rem rgba(0, 0, 0, 0.95))
-        drop-shadow(0 0 3px rgba(255, 255, 255, 0.12));
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
 }
@@ -201,9 +197,7 @@ body.has-background .message.redeem-message:hover {
     vertical-align: middle;
     margin: 0 3px;
     flex: 0 0 auto;
-    filter:
-        drop-shadow(0 2px 3px rgba(0, 0, 0, 0.75))
-        drop-shadow(0 0 4px rgba(255, 255, 255, 0.15));
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
     transition: transform 0.15s ease;
 }
 
