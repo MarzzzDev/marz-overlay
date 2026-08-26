@@ -22,7 +22,7 @@ body {
     margin: 0 0 3px 0;
     padding: 0px 5px;
     gap: 5px;
-    min-height: 137px;
+    min-height: 74px;
     border-radius: 14px;
     background: transparent;
     border-left: none;
@@ -93,7 +93,7 @@ body.has-background .message.redeem-message:hover {
     left: 0;
     overflow: hidden;
     color: white;
-    font-weight: 700;
+    font-weight: 900;
     word-break: normal;
     overflow-wrap: normal;
     white-space: normal;
@@ -165,7 +165,7 @@ body.has-background .message.redeem-message:hover {
     font-family: 'Open Sans', sans-serif;
     font-style: normal;
     font-size: 50px;
-    font-weight: 700;
+    font-weight: 900;
     margin-right: 5px;
     display: flex;
     align-items: center;
@@ -178,7 +178,7 @@ body.has-background .message.redeem-message:hover {
     word-break: normal;
     white-space: normal;
     color: #FF0000;
-    text-shadow: 5px 4px 4px rgba(0, 0, 0, 0.3);
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
     -webkit-background-clip: text;
     background-clip: text;
     text-rendering: geometricPrecision;
@@ -193,7 +193,7 @@ body.has-background .message.redeem-message:hover {
     font-family: 'Open Sans', sans-serif;
     font-style: normal;
     font-size: 50px;
-    font-weight: 700;
+    font-weight: 900;
     letter-spacing: 0.2px;
     display: inline;
     line-height: 68px;
@@ -204,7 +204,7 @@ body.has-background .message.redeem-message:hover {
     overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
-    text-shadow: 5px 4px 4px rgba(0, 0, 0, 0.3);
+    filter: drop-shadow(5px 4px 4px rgba(0, 0, 0, 0.3));
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
     flex: none;
