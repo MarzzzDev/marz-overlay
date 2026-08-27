@@ -27,7 +27,7 @@ body {
     box-shadow: none;
     animation: messageIn 0.25s ease-out forwards;
     white-space: normal;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
     word-break: normal;
 }
 
@@ -41,10 +41,8 @@ body {
     width: auto;
     max-width: none;
     min-width: 0;
+    flex: none;
     margin: 0;
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-break: normal;
 }
 
 body.has-background .message {
@@ -95,7 +93,7 @@ body.has-background .message.redeem-message:hover {
     color: white;
     font-weight: 900;
     word-break: normal;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
     white-space: normal;
     display: flex;
     flex-direction: column;
@@ -163,7 +161,7 @@ body.has-background .message.redeem-message:hover {
     vertical-align: middle;
     max-width: none;
     min-width: 0;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
     color: #FF0000;
@@ -185,7 +183,7 @@ body.has-background .message.redeem-message:hover {
     width: auto;
     max-width: none;
     min-width: 0;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
     word-break: normal;
     white-space: normal;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
