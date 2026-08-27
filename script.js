@@ -91,6 +91,7 @@ const FFZ_EFFECT_FLAGS = Object.freeze({
 
 let twemojiReady = null;
 
+const messageElements = new Map(); 
 
 function getOAuthRedirectUri() {
     return window.location.origin + window.location.pathname;
@@ -5601,7 +5602,8 @@ async function onMsg(
     usernameColor,
     userId,
     tags,
-    targetChat = null
+    targetChat = null,
+    messageId = null
 ) {
     const chat =
         targetChat ||
@@ -5748,6 +5750,11 @@ async function onMsg(
         message
     );
 
+    if (messageId) {
+        message.dataset.messageId = messageId;
+        messageElements.set(messageId, message);
+    }
+
 
     if (userId) {
         get7TVPaint(
@@ -5788,6 +5795,9 @@ async function onMsg(
 
             setTimeout(() => {
                 message.remove();
+                if (messageId) {
+                    messageElements.delete(messageId);
+                }
             }, 1000);
 
         }, fade * 1000 - 1000);
@@ -6616,10 +6626,35 @@ async function handleEventSubMessage(data) {
             );
         }
 
+        if (
+            subscription?.type ===
+            "channel.chat.message_delete"
+        ) {
+            handleEventSubMessageDelete(
+                event
+            );
+        }
+
         return;
     }
 }
 
+function handleEventSubMessageDelete(event) {
+    if (!event) return;
+
+    const messageId = event.message_id;
+
+    if (!messageId) {
+        return;
+    }
+
+    const element = messageElements.get(messageId);
+
+    if (element) {
+        element.remove();
+        messageElements.delete(messageId);
+    }
+}
 
 async function subscribeToChat() {
     if (
@@ -6639,92 +6674,79 @@ async function subscribeToChat() {
         return;
     }
 
-    const body = {
-        type:
-            "channel.chat.message",
+    const condition = {
+        broadcaster_user_id:
+            String(TWITCH_USER_ID),
 
-        version:
-            "1",
-
-        condition: {
-            broadcaster_user_id:
-                String(TWITCH_USER_ID),
-
-            user_id:
-                String(authenticatedUserId)
-        },
-        transport: {
-            method:
-                "websocket",
-
-            session_id:
-                eventSubSessionId
-        }
+        user_id:
+            String(authenticatedUserId)
     };
 
+    const transport = {
+        method:
+            "websocket",
 
-    try {
-        const response =
-            await fetch(
-                "https://api.twitch.tv/helix/eventsub/subscriptions",
-                {
-                    method:
-                        "POST",
+        session_id:
+            eventSubSessionId
+    };
 
-                    headers: {
-                        "Client-ID":
-                            TWITCH_CLIENT_ID,
-
-                        "Authorization":
-                            `Bearer ${accessToken}`,
-
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify(body)
-                }
-            );
-
-
-        const responseText =
-            await response.text();
-
-
-        if (!response.ok) {
-            console.error(
-                "EventSub subscription failed:",
-                response.status,
-                responseText
-            );
-
-            return;
+    const subscriptions = [
+        {
+            type: "channel.chat.message",
+            version: "1",
+            condition,
+            transport
+        },
+        {
+            type: "channel.chat.message_delete",
+            version: "1",
+            condition,
+            transport
         }
+    ];
 
-
-        let result = null;
-
+    for (const body of subscriptions) {
         try {
-            result =
-                JSON.parse(
+            const response =
+                await fetch(
+                    "https://api.twitch.tv/helix/eventsub/subscriptions",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Client-ID": TWITCH_CLIENT_ID,
+                            "Authorization": `Bearer ${accessToken}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(body)
+                    }
+                );
+
+            const responseText =
+                await response.text();
+
+            if (!response.ok) {
+                console.error(
+                    "EventSub subscription failed:",
+                    body.type,
+                    response.status,
                     responseText
                 );
-        } catch {
-  
+
+                continue;
+            }
+
+            console.log(
+                "EventSub subscription created:",
+                body.type
+            );
+
+        } catch (error) {
+            console.error(
+                "EventSub subscription request error:",
+                body.type,
+                error
+            );
         }
-
-
-        console.log(
-            "EventSub chat subscription created:",
-            result
-        );
-
-    } catch (error) {
-        console.error(
-            "EventSub subscription request error:",
-            error
-        );
     }
 }
 
@@ -6734,6 +6756,7 @@ function handleEventSubChatMessage(event) {
     const username = event.chatter_user_name || event.chatter_user_login || "Unknown";
     const userId = event.chatter_user_id || null;
     const usernameColor = getTwitchDisplayColor(event.color);
+    const messageId = event.message_id || null;
 
     const rawText = event.message?.text || "";
     const actionMatch = rawText.match(/^\x01?ACTION /);
@@ -6764,7 +6787,7 @@ function handleEventSubChatMessage(event) {
     };
 
     try {
-        onMsg(username, rawText, usernameColor, userId, tags);
+        onMsg(username, rawText, usernameColor, userId, tags, null, messageId);
     } catch (error) {
         console.error("Message rendering error:", error, { username, rawText });
     }
