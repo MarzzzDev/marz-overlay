@@ -5440,25 +5440,131 @@ function getReplyInfo(tags, msg) {
     return { username: replyUsername, message: cleanMessage };
 }
 
-function getTwitchDisplayColor(color) {
-    if (
-        typeof color !== "string" ||
-        !color.trim()
-    ) {
-        return "#ffffff";
+function getTwitchDisplayColor(
+    color
+) {
+    if (!color) {
+        return "#FFFFFF";
     }
 
-    color = color.trim();
+    let hex =
+        String(color).trim();
 
-
-    if (
-        /^#[0-9a-f]{6}$/i.test(color)
-    ) {
-        return color;
+    if (!hex.startsWith("#")) {
+        hex =
+            `#${hex}`;
     }
 
-    return "#ffffff";
+    if (
+        !/^#[0-9a-fA-F]{6}$/.test(
+            hex
+        )
+    ) {
+        return "#FFFFFF";
+    }
+
+    const r =
+        parseInt(
+            hex.slice(1, 3),
+            16
+        );
+
+    const g =
+        parseInt(
+            hex.slice(3, 5),
+            16
+        );
+
+    const b =
+        parseInt(
+            hex.slice(5, 7),
+            16
+        );
+
+    const maxChannel =
+        Math.max(
+            r,
+            g,
+            b
+        );
+
+    if (
+        maxChannel < 80
+    ) {
+        const boost =
+            115 /
+            Math.max(
+                maxChannel,
+                1
+            );
+
+        const nr =
+            Math.min(
+                255,
+                Math.round(
+                    r * boost
+                )
+            );
+
+        const ng =
+            Math.min(
+                255,
+                Math.round(
+                    g * boost
+                )
+            );
+
+        const nb =
+            Math.min(
+                255,
+                Math.round(
+                    b * boost
+                )
+            );
+
+        return (
+            `rgb(${nr}, ${ng}, ${nb})`
+        );
+    }
+
+    if (
+        maxChannel < 130
+    ) {
+        const boost =
+            1.25;
+
+        const nr =
+            Math.min(
+                255,
+                Math.round(
+                    r * boost
+                )
+            );
+
+        const ng =
+            Math.min(
+                255,
+                Math.round(
+                    g * boost
+                )
+            );
+
+        const nb =
+            Math.min(
+                255,
+                Math.round(
+                    b * boost
+                )
+            );
+
+        return (
+            `rgb(${nr}, ${ng}, ${nb})`
+        );
+    }
+
+    return hex;
 }
+
 function addPreviewMessage(
     user,
     msg,
