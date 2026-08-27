@@ -2872,9 +2872,6 @@ async function applyPaint(
                     type.angle ?? 0
                 );
 
-            angle =
-                (angle + 180) % 360;
-
             background =
                 `${type.repeating ? "repeating-" : ""}` +
                 `linear-gradient(` +
