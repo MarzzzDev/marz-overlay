@@ -152,14 +152,6 @@ document.body.classList.toggle(
     backgroundEnabled
 );
 
-let backgroundEnabled =
-    overlaySettings.background === true;
-
-document.body.classList.toggle(
-    "has-background",
-    backgroundEnabled
-);
-
 let backgroundColor =
     typeof overlaySettings.backgroundColor === "string" &&
     /^#[0-9a-fA-F]{6}$/.test(overlaySettings.backgroundColor)
