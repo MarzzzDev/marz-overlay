@@ -91,7 +91,8 @@ const FFZ_EFFECT_FLAGS = Object.freeze({
 
 let twemojiReady = null;
 
-const messageElements = new Map(); 
+const messageElements = new Map();
+const userMessageElements = new Map();
 
 function getOAuthRedirectUri() {
     return window.location.origin + window.location.pathname;
@@ -5757,6 +5758,10 @@ async function onMsg(
 
 
     if (userId) {
+        if (!userMessageElements.has(userId)) {
+            userMessageElements.set(userId, new Set());
+        }
+        userMessageElements.get(userId).add(message);
         get7TVPaint(
             userId
         )
@@ -5795,8 +5800,17 @@ async function onMsg(
 
             setTimeout(() => {
                 message.remove();
+
                 if (messageId) {
                     messageElements.delete(messageId);
+                }
+
+                if (userId && userMessageElements.has(userId)) {
+                    userMessageElements.get(userId).delete(message);
+
+                    if (userMessageElements.get(userId).size === 0) {
+                        userMessageElements.delete(userId);
+                    }
                 }
             }, 1000);
 
@@ -6635,6 +6649,22 @@ async function handleEventSubMessage(data) {
             );
         }
 
+        if (
+            subscription?.type ===
+            "channel.chat.clear_user_messages"
+        ) {
+            handleEventSubClearUserMessages(
+                event
+            );
+        }
+
+        if (
+            subscription?.type ===
+            "channel.chat.clear"
+        ) {
+            handleEventSubClearChat();
+        }
+
         return;
     }
 }
@@ -6702,6 +6732,18 @@ async function subscribeToChat() {
             version: "1",
             condition,
             transport
+        },
+        {
+            type: "channel.chat.clear_user_messages",
+            version: "1",
+            condition,
+            transport
+        },
+        {
+            type: "channel.chat.clear",
+            version: "1",
+            condition,
+            transport
         }
     ];
 
@@ -6748,6 +6790,45 @@ async function subscribeToChat() {
             );
         }
     }
+}
+
+function handleEventSubClearUserMessages(event) {
+    if (!event) return;
+
+    const userId = event.target_user_id;
+
+    if (!userId) {
+        return;
+    }
+
+    const elements = userMessageElements.get(userId);
+
+    if (!elements) {
+        return;
+    }
+
+    for (const element of elements) {
+        const messageId = element.dataset.messageId;
+
+        element.remove();
+
+        if (messageId) {
+            messageElements.delete(messageId);
+        }
+    }
+
+    userMessageElements.delete(userId);
+}
+
+function handleEventSubClearChat() {
+    const chat = document.getElementById("chat");
+
+    if (chat) {
+        chat.innerHTML = "";
+    }
+
+    messageElements.clear();
+    userMessageElements.clear();
 }
 
 function handleEventSubChatMessage(event) {
