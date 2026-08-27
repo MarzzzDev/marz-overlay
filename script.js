@@ -2631,7 +2631,8 @@ function createPaintDropShadowFilter(paint) {
             return filters.join(" ");
         }
     }
-    return null;
+
+    return "__NORMAL_USERNAME_SHADOW__";
 }
 
 function getPaintFallbackColor(paint) {
@@ -3033,6 +3034,14 @@ async function applyPaint(
         );
 
     if (
+        shadowFilter ===
+        "__NORMAL_USERNAME_SHADOW__"
+    ) {
+        element.style.filter =
+            "none";
+        element.style.textShadow =
+            "1px 1px 2px rgba(0, 0, 0, 0.85)";
+    } else if (
         shadowFilter &&
         shadowFilter !== "none"
     ) {
@@ -3040,11 +3049,6 @@ async function applyPaint(
             shadowFilter;
         element.style.textShadow =
             "none";
-    } else {
-        element.style.filter =
-            "none";
-        element.style.textShadow =
-            "1px 1px 2px rgba(0, 0, 0, 0.85)";
     }
 
     element.style.backgroundOrigin =
