@@ -2631,8 +2631,7 @@ function createPaintDropShadowFilter(paint) {
             return filters.join(" ");
         }
     }
-
-    return "__NORMAL_USERNAME_SHADOW__";
+    return null;
 }
 
 function getPaintFallbackColor(paint) {
