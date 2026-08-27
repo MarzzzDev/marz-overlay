@@ -10,6 +10,8 @@ body {
 
 :root {
     --chat-scale: 1;
+    --bg-color-1: rgba(45, 12, 18, 0.9);
+    --bg-color-2: rgba(65, 18, 25, 0.75);
 }
 
 .message {
@@ -48,8 +50,8 @@ body {
 body.has-background .message {
     background: linear-gradient(
         90deg,
-        rgba(45, 12, 18, 0.9),
-        rgba(65, 18, 25, 0.75)
+        var(--bg-color-1),
+        var(--bg-color-2)
     );
 
     box-shadow:
@@ -147,6 +149,10 @@ body.has-background .message.redeem-message:hover {
     object-fit: contain;
     display: block;
     flex: 0 0 auto;
+}
+
+.badges.no-badges {
+    display: none;
 }
 
 .username {
