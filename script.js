@@ -972,35 +972,63 @@ function showTwitchLoginScreen() {
     backgroundColorInput.value =
         backgroundColor;
 
-    backgroundColorInput.disabled =
-        !backgroundEnabled;
-
     backgroundColorInput.style.cssText = `
+        box-sizing: border-box;
+        -webkit-appearance: none;
+        appearance: none;
+
         width: 40px;
         height: 20px;
 
         padding: 0;
-
         border: 1px solid #46464f;
         border-radius: 4px;
 
         background: transparent;
 
         cursor: pointer;
-
-        opacity: ${backgroundEnabled ? "1" : ".4"};
     `;
+
+    const colorSwatchFix =
+        document.createElement("style");
+
+    colorSwatchFix.textContent = `
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 3px;
+        }
+        input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 3px;
+        }
+    `;
+
+    document.head.appendChild(colorSwatchFix);
+
+    function handleBackgroundColorChange() {
+        backgroundColor =
+            backgroundColorInput.value;
+
+        applyBackgroundColor(
+            backgroundColor
+        );
+        if (!backgroundCheckbox.checked) {
+            backgroundCheckbox.checked = true;
+            backgroundCheckbox.dispatchEvent(new Event("change"));
+        }
+    }
 
     backgroundColorInput.addEventListener(
         "input",
-        () => {
-            backgroundColor =
-                backgroundColorInput.value;
+        handleBackgroundColorChange
+    );
 
-            applyBackgroundColor(
-                backgroundColor
-            );
-        }
+    backgroundColorInput.addEventListener(
+        "change",
+        handleBackgroundColorChange
     );
 
     backgroundColorRow.appendChild(
@@ -1014,7 +1042,6 @@ function showTwitchLoginScreen() {
     settings.appendChild(
         backgroundColorRow
     );
-
 
     const wrapCheckbox =
         createToggle(
