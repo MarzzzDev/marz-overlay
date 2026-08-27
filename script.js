@@ -3032,7 +3032,7 @@ async function applyPaint(
             paint
         );
 
-    if (
+    /*if (
         shadowFilter ===
         "__NORMAL_USERNAME_SHADOW__"
     ) {
@@ -3048,7 +3048,7 @@ async function applyPaint(
             shadowFilter;
         element.style.textShadow =
             "none";
-    }
+    }*/
 
     element.style.backgroundOrigin =
         "border-box";
