@@ -416,15 +416,23 @@ function createYouTubeMemberBadge() {
 
 
 function createYouTubeMessageText(message) {
-    const container = document.createElement("span");
+    const container =
+        document.createElement("span");
 
-    container.className = "text";
+    container.className =
+        "text";
 
     if (message) {
-        renderExternalText(container, message);
+        container.appendChild(
+            document.createTextNode(
+                message
+            )
+        );
     }
 
-    renderTwemoji(container);
+    renderTwemoji(
+        container
+    );
 
     return container;
 }
