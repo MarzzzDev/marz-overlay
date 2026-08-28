@@ -436,10 +436,8 @@ async function addYouTubeMessage(
     const snippet =
         item?.snippet;
 
-    console.log(
-        "FULL YOUTUBE MESSAGE:",
-        item
-    );
+    console.log("YT MESSAGE TEXT:", snippet?.displayMessage);
+    console.log("YT SNIPPET:", JSON.stringify(snippet, null, 2));
 
     const author =
         item?.authorDetails;
