@@ -415,67 +415,16 @@ function createYouTubeMemberBadge() {
 }
 
 
-function createYouTubeMessageText(
-    runs
-) {
-    const container =
-        document.createElement(
-            "span"
-        );
+function createYouTubeMessageText(message) {
+    const container = document.createElement("span");
 
-    container.className =
-        "text";
+    container.className = "text";
 
-    for (
-        const run
-        of runs || []
-    ) {
-        if (
-            run?.text !== undefined
-        ) {
-            renderExternalText(
-                container,
-                run.text
-            );
-
-            continue;
-        }
-
-        const emoji =
-            run?.emoji;
-
-        if (!emoji) {
-            continue;
-        }
-
-        const image =
-            emoji.image?.thumbnails?.[
-                emoji.image.thumbnails.length - 1
-            ];
-
-        if (!image?.url) {
-            continue;
-        }
-
-        const emote =
-            createEmote(
-                image.url,
-                emoji.shortcuts?.[0] ||
-                emoji.emojiId ||
-                "YouTube emote"
-            );
-
-        emote.dataset.youtubeEmote =
-            "true";
-
-        container.appendChild(
-            emote
-        );
+    if (message) {
+        renderExternalText(container, message);
     }
 
-    renderTwemoji(
-        container
-    );
+    renderTwemoji(container);
 
     return container;
 }
@@ -486,6 +435,11 @@ async function addYouTubeMessage(
 ) {
     const snippet =
         item?.snippet;
+
+    console.log(
+        "FULL YOUTUBE MESSAGE:",
+        item
+    );
 
     const author =
         item?.authorDetails;
