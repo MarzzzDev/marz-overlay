@@ -723,7 +723,7 @@ async function startYouTubeChat() {
     if (
         !YOUTUBE_API_KEY ||
         YOUTUBE_API_KEY ===
-        "AIzaSyD4Vz1SbTi1F1sHO0YFX6o68JBuNwFGbZE"
+        "ae"
     ) {
         console.warn(
             "YouTube chat disabled: no YouTube API key configured."
