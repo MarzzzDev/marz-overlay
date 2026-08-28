@@ -18,7 +18,7 @@ const YOUTUBE_MEMBER_COLOR = "#2ba640";
 
 const YOUTUBE_MEMBER_BADGE =
     "https://www.gstatic.com/youtube/img/creator/creator_member/creator_member_badge.png";
-
+const youtubeEmotes = new Map();
 let accessToken = null;
 let authenticatedUserId = null;
 let authenticatedUsername = null;
@@ -134,6 +134,48 @@ const SEVENTV_OPCODES = Object.freeze({
     SUBSCRIBE: 35,
     UNSUBSCRIBE: 36
 });
+
+async function loadYouTubeEmotes() {
+    try {
+        const response = await fetch(
+            "https://gist.githubusercontent.com/ZonianMidian/fc833761e7d31a3e64cd0ff288d61067/raw"
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `YouTube emote map failed: ${response.status}`
+            );
+        }
+
+        const data = await response.json();
+
+        for (const emote of data) {
+            if (
+                !emote?.name ||
+                !emote?.image
+            ) {
+                continue;
+            }
+
+            youtubeEmotes.set(
+                emote.name,
+                emote.image
+            );
+        }
+
+        console.log(
+            `Loaded ${youtubeEmotes.size} YouTube emotes.`
+        );
+
+    } catch (error) {
+        console.error(
+            "YouTube emote load error:",
+            error
+        );
+    }
+}
+
+await loadYouTubeEmotes();
 
 async function getYouTubeChannelId() {
     try {
@@ -422,21 +464,55 @@ function createYouTubeMessageText(message) {
     container.className =
         "text";
 
-    if (message) {
+    if (!message) {
+        return container;
+    }
+
+    const parts =
+        message.split(
+            /(\s+)/
+        );
+
+    for (const part of parts) {
+        if (!part) {
+            continue;
+        }
+
+        const emoteUrl =
+            youtubeEmotes.get(part);
+
+        if (emoteUrl) {
+            const emote =
+                createEmote(
+                    emoteUrl,
+                    part
+                );
+
+            emote.classList.add(
+                "youtube-emote"
+            );
+
+            emote.dataset.youtubeEmote =
+                "true";
+
+            container.appendChild(
+                emote
+            );
+
+            continue;
+        }
+
         container.appendChild(
             document.createTextNode(
-                message
+                part
             )
         );
     }
 
-    renderTwemoji(
-        container
-    );
+    renderTwemoji(container);
 
     return container;
 }
-
 
 async function addYouTubeMessage(
     item
