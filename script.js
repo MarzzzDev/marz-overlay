@@ -6,6 +6,19 @@ const TWITCH_OAUTH_SCOPES = [
     "user:read:chat"
 ];
 
+const YOUTUBE_API_KEY = "AIzaSyAyuBLoymHXsMtJG_WzpjwTj7rYd-1ZEe0";
+const YOUTUBE_CHANNEL_HANDLE = "@Dodorel";
+
+let youtubeChannelId = null;
+let youtubeLiveChatId = null;
+let youtubeNextPageToken = null;
+let youtubePollTimer = null;
+
+const YOUTUBE_MEMBER_COLOR = "#2ba640";
+
+const YOUTUBE_MEMBER_BADGE =
+    "https://www.gstatic.com/youtube/img/creator/creator_member/creator_member_badge.png";
+
 let accessToken = null;
 let authenticatedUserId = null;
 let authenticatedUsername = null;
@@ -121,6 +134,633 @@ const SEVENTV_OPCODES = Object.freeze({
     SUBSCRIBE: 35,
     UNSUBSCRIBE: 36
 });
+
+async function getYouTubeChannelId() {
+    try {
+        const response =
+            await fetch(
+                "https://www.googleapis.com/youtube/v3/channels?" +
+                new URLSearchParams({
+                    part: "id",
+                    forHandle: YOUTUBE_CHANNEL_HANDLE,
+                    key: YOUTUBE_API_KEY
+                })
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                `YouTube channel lookup failed: ${response.status}`
+            );
+        }
+
+        const data =
+            await response.json();
+
+        const channel =
+            data.items?.[0];
+
+        if (!channel?.id) {
+            throw new Error(
+                `YouTube channel not found: ${YOUTUBE_CHANNEL_HANDLE}`
+            );
+        }
+
+        youtubeChannelId =
+            channel.id;
+
+        console.log(
+            "YouTube channel ID:",
+            youtubeChannelId
+        );
+
+        return youtubeChannelId;
+
+    } catch (error) {
+        console.error(
+            "YouTube channel lookup error:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+async function getYouTubeLiveChatId() {
+    if (!youtubeChannelId) {
+        return null;
+    }
+
+    try {
+        const response =
+            await fetch(
+                "https://www.googleapis.com/youtube/v3/search?" +
+                new URLSearchParams({
+                    part: "id",
+                    channelId: youtubeChannelId,
+                    eventType: "live",
+                    type: "video",
+                    maxResults: "1",
+                    key: YOUTUBE_API_KEY
+                })
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                `YouTube live search failed: ${response.status}`
+            );
+        }
+
+        const data =
+            await response.json();
+
+        const video =
+            data.items?.[0];
+
+        const videoId =
+            video?.id?.videoId;
+
+        if (!videoId) {
+            return null;
+        }
+
+        const videoResponse =
+            await fetch(
+                "https://www.googleapis.com/youtube/v3/videos?" +
+                new URLSearchParams({
+                    part: "liveStreamingDetails",
+                    id: videoId,
+                    key: YOUTUBE_API_KEY
+                })
+            );
+
+        if (!videoResponse.ok) {
+            throw new Error(
+                `YouTube video lookup failed: ${videoResponse.status}`
+            );
+        }
+
+        const videoData =
+            await videoResponse.json();
+
+        const liveChatId =
+            videoData
+                .items?.[0]
+                ?.liveStreamingDetails
+                ?.activeLiveChatId;
+
+        if (!liveChatId) {
+            return null;
+        }
+
+        youtubeLiveChatId =
+            liveChatId;
+
+        youtubeNextPageToken =
+            null;
+
+        console.log(
+            "YouTube live chat ID:",
+            youtubeLiveChatId
+        );
+
+        return youtubeLiveChatId;
+
+    } catch (error) {
+        console.error(
+            "YouTube live chat lookup error:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+function createYouTubeMemberBadge() {
+    const container =
+        document.createElement(
+            "span"
+        );
+
+    container.className =
+        "badges youtube-badges";
+
+    const img =
+        document.createElement(
+            "img"
+        );
+
+    img.className =
+        "badge";
+
+    img.src =
+        YOUTUBE_MEMBER_BADGE;
+
+    img.alt =
+        "YouTube Member";
+
+    img.title =
+        "YouTube Member";
+
+    img.width =
+        18;
+
+    img.height =
+        18;
+
+    img.style.width =
+        "18px";
+
+    img.style.height =
+        "18px";
+
+    img.style.objectFit =
+        "contain";
+
+    img.style.verticalAlign =
+        "middle";
+
+    img.style.marginRight =
+        "2px";
+
+    img.dataset.badgeType =
+        "youtube-member";
+
+    img.dataset.badgeProvider =
+        "youtube";
+
+    container.appendChild(
+        img
+    );
+
+    return container;
+}
+
+
+function createYouTubeMessageText(
+    runs
+) {
+    const container =
+        document.createElement(
+            "span"
+        );
+
+    container.className =
+        "text";
+
+    for (
+        const run
+        of runs || []
+    ) {
+        if (
+            run?.text !== undefined
+        ) {
+            renderExternalText(
+                container,
+                run.text
+            );
+
+            continue;
+        }
+
+        const emoji =
+            run?.emoji;
+
+        if (!emoji) {
+            continue;
+        }
+
+        const image =
+            emoji.image?.thumbnails?.[
+                emoji.image.thumbnails.length - 1
+            ];
+
+        if (!image?.url) {
+            continue;
+        }
+
+        const emote =
+            createEmote(
+                image.url,
+                emoji.shortcuts?.[0] ||
+                emoji.emojiId ||
+                "YouTube emote"
+            );
+
+        emote.dataset.youtubeEmote =
+            "true";
+
+        container.appendChild(
+            emote
+        );
+    }
+
+    renderTwemoji(
+        container
+    );
+
+    return container;
+}
+
+
+async function addYouTubeMessage(
+    item
+) {
+    const snippet =
+        item?.snippet;
+
+    const author =
+        item?.authorDetails;
+
+    if (
+        !snippet ||
+        !author
+    ) {
+        return;
+    }
+
+    if (
+        snippet.type !==
+        "textMessageEvent"
+    ) {
+        return;
+    }
+
+    const chat =
+        document.getElementById(
+            "chat"
+        );
+
+    if (!chat) {
+        return;
+    }
+
+    const username =
+        author.displayName ||
+        "YouTube User";
+
+    const userId =
+        author.channelId
+            ? `youtube:${author.channelId}`
+            : `youtube:${username}`;
+
+    const messageId =
+        item.id
+            ? `youtube:${item.id}`
+            : null;
+
+    if (
+        messageId &&
+        messageElements.has(
+            messageId
+        )
+    ) {
+        return;
+    }
+
+    const isMember =
+        Boolean(
+            author.isChatSponsor
+        );
+
+    const usernameColor =
+        isMember
+            ? YOUTUBE_MEMBER_COLOR
+            : "#ffffff";
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+    message.className =
+        "message youtube-message";
+
+    if (wrapEnabled) {
+        message.classList.add(
+            "wrap-message"
+        );
+    }
+
+    message.style.setProperty(
+        "--user-color",
+        usernameColor
+    );
+
+    const badges =
+        document.createElement(
+            "span"
+        );
+
+    badges.className =
+        "badges youtube-badges";
+
+    if (
+        badgesEnabled &&
+        isMember
+    ) {
+        const memberBadge =
+            createYouTubeMemberBadge();
+
+        badges.append(
+            ...memberBadge.children
+        );
+    }
+
+    const usernameElement =
+        document.createElement(
+            "span"
+        );
+
+    usernameElement.className =
+        "username";
+
+    usernameElement.textContent =
+        `${username}: `;
+
+    usernameElement.style.color =
+        usernameColor;
+
+    usernameElement.style.webkitTextFillColor =
+        usernameColor;
+
+    const text =
+        createYouTubeMessageText(
+            snippet.displayMessageRuns
+        );
+
+    message.appendChild(
+        badges
+    );
+
+    message.appendChild(
+        usernameElement
+    );
+
+    message.appendChild(
+        text
+    );
+
+    chat.appendChild(
+        message
+    );
+
+    if (messageId) {
+        message.dataset.messageId =
+            messageId;
+
+        messageElements.set(
+            messageId,
+            message
+        );
+    }
+
+    if (userId) {
+        if (
+            !userMessageElements.has(
+                userId
+            )
+        ) {
+            userMessageElements.set(
+                userId,
+                new Set()
+            );
+        }
+
+        userMessageElements
+            .get(userId)
+            .add(message);
+    }
+
+    if (fade != false) {
+        setTimeout(
+            () => {
+                message.style.animation =
+                    "messageFadeOut 1s ease-in forwards";
+
+                setTimeout(
+                    () => {
+                        message.remove();
+
+                        if (messageId) {
+                            messageElements.delete(
+                                messageId
+                            );
+                        }
+
+                        if (
+                            userId &&
+                            userMessageElements.has(
+                                userId
+                            )
+                        ) {
+                            const messages =
+                                userMessageElements.get(
+                                    userId
+                                );
+
+                            messages.delete(
+                                message
+                            );
+
+                            if (
+                                messages.size ===
+                                0
+                            ) {
+                                userMessageElements.delete(
+                                    userId
+                                );
+                            }
+                        }
+                    },
+                    1000
+                );
+            },
+            fade * 1000 - 1000
+        );
+    }
+}
+
+
+async function pollYouTubeLiveChat() {
+    if (!youtubeLiveChatId) {
+        return;
+    }
+
+    try {
+        const params =
+            new URLSearchParams({
+                part:
+                    "id,snippet,authorDetails",
+
+                liveChatId:
+                    youtubeLiveChatId,
+
+                maxResults:
+                    "200",
+
+                key:
+                    YOUTUBE_API_KEY
+            });
+
+        if (
+            youtubeNextPageToken
+        ) {
+            params.set(
+                "pageToken",
+                youtubeNextPageToken
+            );
+        }
+
+        const response =
+            await fetch(
+                "https://www.googleapis.com/youtube/v3/liveChat/messages?" +
+                params.toString()
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                `YouTube live chat request failed: ${response.status}`
+            );
+        }
+
+        const data =
+            await response.json();
+
+        youtubeNextPageToken =
+            data.nextPageToken ||
+            youtubeNextPageToken;
+
+        for (
+            const item
+            of data.items || []
+        ) {
+            await addYouTubeMessage(
+                item
+            );
+        }
+
+        const delay =
+            Math.max(
+                1000,
+                Number(
+                    data.pollingIntervalMillis ||
+                    2000
+                )
+            );
+
+        clearTimeout(
+            youtubePollTimer
+        );
+
+        youtubePollTimer =
+            setTimeout(
+                pollYouTubeLiveChat,
+                delay
+            );
+
+    } catch (error) {
+        console.error(
+            "YouTube live chat polling error:",
+            error
+        );
+
+        clearTimeout(
+            youtubePollTimer
+        );
+
+        youtubePollTimer =
+            setTimeout(
+                pollYouTubeLiveChat,
+                5000
+            );
+    }
+}
+
+
+async function startYouTubeChat() {
+    if (
+        !YOUTUBE_API_KEY ||
+        YOUTUBE_API_KEY ===
+        "AIzaSyAyuBLoymHXsMtJG_WzpjwTj7rYd-1ZEe0"
+    ) {
+        console.warn(
+            "YouTube chat disabled: no YouTube API key configured."
+        );
+
+        return;
+    }
+
+    const channelId =
+        await getYouTubeChannelId();
+
+    if (!channelId) {
+        return;
+    }
+
+    const liveChatId =
+        await getYouTubeLiveChatId();
+
+    if (!liveChatId) {
+        console.log(
+            "Dodorel is not currently live on YouTube."
+        );
+
+        setTimeout(
+            startYouTubeChat,
+            30000
+        );
+
+        return;
+    }
+
+    console.log(
+        "Connected to Dodorel YouTube Live chat."
+    );
+
+    pollYouTubeLiveChat();
+}
 
 function connectSevenTVEvents(emoteSetId, url = null) {
     if (!emoteSetId) {
@@ -7228,6 +7868,8 @@ async function startOverlay() {
         });
 
     createEventSubSocket();
+
+    startYouTubeChat();
 
     setInterval(
         async () => {
