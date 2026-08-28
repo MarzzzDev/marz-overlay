@@ -6,7 +6,7 @@ const TWITCH_OAUTH_SCOPES = [
     "user:read:chat"
 ];
 
-const YOUTUBE_API_KEY = "AIzaSyAyuBLoymHXsMtJG_WzpjwTj7rYd-1ZEe0";
+const YOUTUBE_API_KEY = "AIzaSyD4Vz1SbTi1F1sHO0YFX6o68JBuNwFGbZE";
 const YOUTUBE_CHANNEL_HANDLE = "@Dodorel";
 
 let youtubeChannelId = null;
@@ -723,7 +723,7 @@ async function startYouTubeChat() {
     if (
         !YOUTUBE_API_KEY ||
         YOUTUBE_API_KEY ===
-        "AIzaSyAyuBLoymHXsMtJG_WzpjwTj7rYd-1ZEe0"
+        "AIzaSyD4Vz1SbTi1F1sHO0YFX6o68JBuNwFGbZE"
     ) {
         console.warn(
             "YouTube chat disabled: no YouTube API key configured."
