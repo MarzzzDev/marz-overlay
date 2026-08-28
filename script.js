@@ -564,7 +564,7 @@ async function addYouTubeMessage(
 
     const text =
         createYouTubeMessageText(
-            snippet.displayMessageRuns
+            snippet.displayMessage
         );
 
     message.appendChild(
