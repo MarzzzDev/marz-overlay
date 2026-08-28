@@ -102,6 +102,208 @@ const params = new URLSearchParams(
     window.location.search
 );
 
+let sevenTVEventSocket = null;
+let sevenTVSessionId = null;
+let sevenTVEmoteSetId = null;
+let sevenTVHeartbeatTimeout = null;
+let sevenTVReconnectTimer = null;
+ 
+const SEVENTV_OPCODES = Object.freeze({
+    DISPATCH: 0,
+    HELLO: 1,
+    HEARTBEAT: 2,
+    RECONNECT: 4,
+    ACK: 5,
+    ERROR: 6,
+    END_OF_STREAM: 7,
+    IDENTIFY: 33,
+    RESUME: 34,
+    SUBSCRIBE: 35,
+    UNSUBSCRIBE: 36
+});
+
+function connectSevenTVEvents(emoteSetId, url = null) {
+    if (!emoteSetId) {
+        return;
+    }
+ 
+    sevenTVEmoteSetId = emoteSetId;
+ 
+    const socketUrl = url || "wss://events.7tv.io/v3";
+ 
+    console.log("Connecting to 7TV EventAPI:", socketUrl);
+ 
+    const socket = new WebSocket(socketUrl);
+    sevenTVEventSocket = socket;
+ 
+    socket.onopen = () => {
+        console.log("Connected to 7TV EventAPI WebSocket.");
+    };
+ 
+    socket.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            handleSevenTVEventMessage(data);
+        } catch (error) {
+            console.error("7TV EventAPI message error:", error);
+        }
+    };
+ 
+    socket.onerror = (error) => {
+        console.error("7TV EventAPI WebSocket error:", error);
+    };
+ 
+    socket.onclose = (event) => {
+        console.log("7TV EventAPI WebSocket closed:", event.code, event.reason);
+ 
+        sevenTVEventSocket = null;
+        sevenTVSessionId = null;
+ 
+        clearTimeout(sevenTVHeartbeatTimeout);
+        clearTimeout(sevenTVReconnectTimer);
+ 
+        sevenTVReconnectTimer = setTimeout(() => {
+            if (sevenTVEmoteSetId && !sevenTVEventSocket) {
+                connectSevenTVEvents(sevenTVEmoteSetId);
+            }
+        }, 3000);
+    };
+ 
+    return socket;
+}
+ 
+function handleSevenTVEventMessage(data) {
+    const op = data?.op;
+ 
+    if (op === SEVENTV_OPCODES.HELLO) {
+        sevenTVSessionId = data.d?.session_id || null;
+ 
+        console.log("7TV EventAPI session:", sevenTVSessionId);
+ 
+        resetSevenTVHeartbeatWatchdog(data.d?.heartbeat_interval);
+ 
+        subscribeToEmoteSetUpdates(sevenTVEmoteSetId);
+ 
+        return;
+    }
+ 
+    if (op === SEVENTV_OPCODES.HEARTBEAT) {
+        resetSevenTVHeartbeatWatchdog(data.d?.heartbeat_interval);
+        return;
+    }
+ 
+    if (op === SEVENTV_OPCODES.RECONNECT) {
+        console.log("7TV requested EventAPI reconnect.");
+ 
+        if (sevenTVEventSocket) {
+            sevenTVEventSocket.close();
+        }
+ 
+        return;
+    }
+ 
+    if (op === SEVENTV_OPCODES.ERROR) {
+        console.error("7TV EventAPI error:", data.d);
+        return;
+    }
+ 
+    if (op === SEVENTV_OPCODES.DISPATCH) {
+        const type = data.d?.type;
+ 
+        if (type === "emote_set.update") {
+            handleSevenTVEmoteSetUpdate(data.d.body);
+        }
+ 
+        return;
+    }
+}
+ 
+function resetSevenTVHeartbeatWatchdog(intervalMs) {
+    clearTimeout(sevenTVHeartbeatTimeout);
+ 
+    if (!intervalMs) {
+        return;
+    }
+
+    sevenTVHeartbeatTimeout = setTimeout(() => {
+        console.warn("7TV EventAPI heartbeat timeout, reconnecting.");
+ 
+        if (sevenTVEventSocket) {
+            sevenTVEventSocket.close();
+        }
+    }, intervalMs * 2);
+}
+ 
+function subscribeToEmoteSetUpdates(emoteSetId) {
+    if (!sevenTVEventSocket || !emoteSetId) {
+        return;
+    }
+ 
+    const payload = {
+        op: SEVENTV_OPCODES.SUBSCRIBE,
+        d: {
+            type: "emote_set.update",
+            condition: {
+                object_id: emoteSetId
+            }
+        }
+    };
+ 
+    sevenTVEventSocket.send(JSON.stringify(payload));
+ 
+    console.log("Subscribed to 7TV emote_set.update for:", emoteSetId);
+}
+ 
+function handleSevenTVEmoteSetUpdate(body) {
+    if (!body) {
+        return;
+    }
+ 
+    for (const entry of body.pulled || []) {
+        const name = entry?.old_value?.name;
+ 
+        if (name) {
+            sevenTVEmotes.delete(name);
+        }
+    }
+ 
+    for (const entry of body.pushed || []) {
+        if (entry?.value) {
+            add7TVEmote(entry.value);
+        }
+    }
+ 
+    for (const entry of body.updated || []) {
+        const oldName = entry?.old_value?.name;
+ 
+        if (oldName) {
+            sevenTVEmotes.delete(oldName);
+        }
+ 
+        if (entry?.value) {
+            add7TVEmote(entry.value);
+        }
+    }
+ 
+    console.log(
+        `7TV emote set updated: +${(body.pushed || []).length} ` +
+        `-${(body.pulled || []).length} ` +
+        `~${(body.updated || []).length}`
+    );
+}
+ 
+function disconnectSevenTVEvents() {
+    clearTimeout(sevenTVHeartbeatTimeout);
+    clearTimeout(sevenTVReconnectTimer);
+ 
+    sevenTVEmoteSetId = null;
+ 
+    if (sevenTVEventSocket) {
+        sevenTVEventSocket.close();
+        sevenTVEventSocket = null;
+    }
+}
+
 function decodeOverlaySettings() {
     const encoded =
         params.get("settings");
@@ -2048,6 +2250,7 @@ async function load7TVEmotes() {
 
         const setData =
             await setResponse.json();
+            
 
         for (
             const emote
@@ -2055,7 +2258,7 @@ async function load7TVEmotes() {
         ) {
             add7TVEmote(emote);
         }
-
+        connectSevenTVEvents(emoteSetId);
         console.log(
             `Loaded ${sevenTVEmotes.size} 7TV emotes.`
         );
