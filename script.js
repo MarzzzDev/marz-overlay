@@ -198,29 +198,43 @@ async function getYouTubeLiveChatId() {
                 new URLSearchParams({
                     part: "id",
                     channelId: youtubeChannelId,
-                    eventType: "live",
+                    eventType: "upcoming",
                     type: "video",
-                    maxResults: "1",
+                    maxResults: "5",
+                    order: "date",
                     key: YOUTUBE_API_KEY
                 })
             );
 
         if (!response.ok) {
             throw new Error(
-                `YouTube live search failed: ${response.status}`
+                `YouTube upcoming stream search failed: ${response.status}`
             );
         }
 
         const data =
             await response.json();
 
-        const video =
-            data.items?.[0];
+        const videos =
+            data.items || [];
 
-        const videoId =
-            video?.id?.videoId;
+        if (!videos.length) {
+            console.log(
+                "No upcoming YouTube streams found for Dodorel."
+            );
 
-        if (!videoId) {
+            return null;
+        }
+
+        const videoIds =
+            videos
+                .map(
+                    video =>
+                        video?.id?.videoId
+                )
+                .filter(Boolean);
+
+        if (!videoIds.length) {
             return null;
         }
 
@@ -228,28 +242,92 @@ async function getYouTubeLiveChatId() {
             await fetch(
                 "https://www.googleapis.com/youtube/v3/videos?" +
                 new URLSearchParams({
-                    part: "liveStreamingDetails",
-                    id: videoId,
+                    part: "liveStreamingDetails,snippet",
+                    id: videoIds.join(","),
                     key: YOUTUBE_API_KEY
                 })
             );
 
         if (!videoResponse.ok) {
             throw new Error(
-                `YouTube video lookup failed: ${videoResponse.status}`
+                `YouTube upcoming video lookup failed: ${videoResponse.status}`
             );
         }
 
         const videoData =
             await videoResponse.json();
 
+        const now =
+            Date.now();
+
+        const upcomingVideo =
+            (videoData.items || [])
+                .filter(video => {
+                    const startTime =
+                        video
+                            ?.liveStreamingDetails
+                            ?.scheduledStartTime;
+
+                    if (!startTime) {
+                        return true;
+                    }
+
+                    return (
+                        new Date(startTime).getTime() >=
+                        now - 60000
+                    );
+                })
+                .sort((a, b) => {
+                    const aTime =
+                        new Date(
+                            a.liveStreamingDetails?.scheduledStartTime ||
+                            0
+                        ).getTime();
+
+                    const bTime =
+                        new Date(
+                            b.liveStreamingDetails?.scheduledStartTime ||
+                            0
+                        ).getTime();
+
+                    return aTime - bTime;
+                })[0];
+
+        if (!upcomingVideo) {
+            console.log(
+                "No upcoming YouTube stream found for Dodorel."
+            );
+
+            return null;
+        }
+
+        const details =
+            upcomingVideo.liveStreamingDetails;
+
+        const title =
+            upcomingVideo.snippet?.title ||
+            "YouTube stream";
+
+        const scheduledStart =
+            details?.scheduledStartTime;
+
+        if (scheduledStart) {
+            console.log(
+                "Found scheduled YouTube stream:",
+                title,
+                "| starts:",
+                scheduledStart
+            );
+        }
+
         const liveChatId =
-            videoData
-                .items?.[0]
-                ?.liveStreamingDetails
-                ?.activeLiveChatId;
+            details?.activeLiveChatId;
 
         if (!liveChatId) {
+            console.log(
+                "YouTube stream is scheduled, but its live chat is not active yet."
+            );
+
             return null;
         }
 
@@ -260,7 +338,7 @@ async function getYouTubeLiveChatId() {
             null;
 
         console.log(
-            "YouTube live chat ID:",
+            "YouTube live chat activated:",
             youtubeLiveChatId
         );
 
@@ -275,7 +353,6 @@ async function getYouTubeLiveChatId() {
         return null;
     }
 }
-
 
 function createYouTubeMemberBadge() {
     const container =
