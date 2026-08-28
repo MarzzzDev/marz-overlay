@@ -175,7 +175,7 @@ async function loadYouTubeEmotes() {
     }
 }
 
-await loadYouTubeEmotes();
+loadYouTubeEmotes();
 
 async function getYouTubeChannelId() {
     try {
