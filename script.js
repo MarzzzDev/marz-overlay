@@ -3010,6 +3010,9 @@ async function applyPaint(
     element.style.filter =
         "";
 
+    element.style.textShadow =
+        "none";
+
     element.style.color =
         "transparent";
 
