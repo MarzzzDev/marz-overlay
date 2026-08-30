@@ -421,12 +421,10 @@ document.documentElement.style.setProperty(
 const CHAT_FONTS = [
     { label: "Open Sans", value: "'Open Sans', sans-serif" },
     { label: "Arial", value: "Arial, sans-serif" },
-    { label: "Impact", value: "Impact, sans-serif" },
-    { label: "Comic Sans MS", value: "'Comic Sans MS', cursive" },
-    { label: "Georgia", value: "Georgia, serif" },
+    { label: "Comic Sans MS", value: "'Comic Sans MS', sans-serif" },
     { label: "Roboto", value: "'Roboto', sans-serif" },
     { label: "Montserrat", value: "'Montserrat', sans-serif" },
-    { label: "Bangers", value: "'Bangers', cursive" }
+    { label: "Minecraft", value: "Minecraft, sans-serif" },
 ];
 
 const GOOGLE_FONT_FAMILIES = {
@@ -453,9 +451,13 @@ function loadGoogleFontIfNeeded(fontValue) {
 }
 
 const CUSTOM_FONT_FACES = {
-    "'Comic Sans MS', cursive": {
+    "'Comic Sans MS', sans-serif": {
         family: "Comic Sans MS",
         url: "./fonts/COMIC.TTF"
+    },
+    "'Minecraft', sans-serif": {
+        family: "Minecraft",
+        url: "./fonts/Minecraft.ttf"
     }
 };
 
