@@ -766,7 +766,7 @@ const previewMessages = [
         "DOVE! RAAAAAAH RAAAAAAH RAAAAAAH",
         "#DAA520",
         "195845559",
-        { badges: "vip/1,pikachu/1" }
+        { badges: "mod/1,subscriber/1,pikachu/1" }
     ]
 ];
 
