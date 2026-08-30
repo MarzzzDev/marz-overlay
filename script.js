@@ -424,7 +424,7 @@ const CHAT_FONTS = [
     { label: "Comic Sans MS", value: "'Comic Sans MS', sans-serif" },
     { label: "Roboto", value: "'Roboto', sans-serif" },
     { label: "Montserrat", value: "'Montserrat', sans-serif" },
-    { label: "Minecraft", value: "Minecraft, sans-serif" }
+    { label: "Minecraft", value: "'Minecraft', sans-serif" }
 ];
 
 const GOOGLE_FONT_FAMILIES = {
