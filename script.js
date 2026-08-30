@@ -418,6 +418,49 @@ document.documentElement.style.setProperty(
     scale
 );
 
+const CHAT_FONTS = [
+    { label: "Open Sans", value: "'Open Sans', sans-serif" },
+    { label: "Arial", value: "Arial, sans-serif" },
+    { label: "Impact", value: "Impact, sans-serif" },
+    { label: "Comic Sans MS", value: "'Comic Sans MS', cursive" },
+    { label: "Georgia", value: "Georgia, serif" },
+    { label: "Roboto", value: "'Roboto', sans-serif" },
+    { label: "Montserrat", value: "'Montserrat', sans-serif" },
+    { label: "Bangers", value: "'Bangers', cursive" }
+];
+
+const GOOGLE_FONT_FAMILIES = {
+    "'Roboto', sans-serif": "Roboto:wght@400;700;900",
+    "'Montserrat', sans-serif": "Montserrat:wght@400;700;900",
+    "'Bangers', cursive": "Bangers"
+};
+
+const loadedGoogleFonts = new Set();
+
+function loadGoogleFontIfNeeded(fontValue) {
+    const family = GOOGLE_FONT_FAMILIES[fontValue];
+
+    if (!family || loadedGoogleFonts.has(family)) {
+        return;
+    }
+
+    loadedGoogleFonts.add(family);
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}&display=swap`;
+    document.head.appendChild(link);
+}
+
+let chatFont =
+    typeof overlaySettings.font === "string" &&
+    overlaySettings.font.trim()
+        ? overlaySettings.font
+        : "'Open Sans', sans-serif";
+
+document.documentElement.style.setProperty("--chat-font", chatFont);
+loadGoogleFontIfNeeded(chatFont);
+
 let wrapEnabled =
     overlaySettings.wrap === true;
 
@@ -1325,6 +1368,76 @@ function showTwitchLoginScreen() {
             showUnlisted7TV
         );
 
+    const fontSectionTitle =
+        document.createElement("div");
+
+    fontSectionTitle.textContent =
+        "Font";
+
+    fontSectionTitle.style.cssText = `
+        margin-top: 17px;
+        margin-bottom: 9px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #e2e2e8;
+    `;
+
+    const fontLabel =
+        document.createElement("label");
+
+    fontLabel.textContent =
+        "Chat Font";
+
+    fontLabel.style.cssText = `
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #e2e2e8;
+    `;
+
+    const fontSelect =
+        document.createElement("select");
+
+    fontSelect.style.cssText = `
+        width: 100%;
+        height: 32px;
+        box-sizing: border-box;
+        padding: 0 10px;
+        border: 1px solid #46464f;
+        border-radius: 6px;
+        background: #151518;
+        color: #ffffff;
+        outline: none;
+        font-size: 12px;
+        cursor: pointer;
+    `;
+
+    for (const font of CHAT_FONTS) {
+        const option =
+            document.createElement("option");
+
+        option.value = font.value;
+        option.textContent = font.label;
+
+        if (font.value === chatFont) {
+            option.selected = true;
+        }
+
+        fontSelect.appendChild(option);
+    }
+
+    fontSelect.addEventListener("change", () => {
+        chatFont = fontSelect.value;
+
+        document.documentElement.style.setProperty(
+            "--chat-font",
+            chatFont
+        );
+
+        loadGoogleFontIfNeeded(chatFont);
+    });
+
     const animationTitle =
         document.createElement("div");
 
@@ -1658,37 +1771,14 @@ function showTwitchLoginScreen() {
             "none";
 
         const overlaySettings = {
-            background:
-                backgroundCheckbox.checked,
-
-            backgroundColor:
-                backgroundColorInput.value,
-
-            fade:
-                noFade.checked
-                    ? false
-                    : Math.max(
-                        1,
-                        Number(fadeInput.value) || 15
-                    ),
-
-            badges:
-                badgesCheckbox.checked,
-
-            scale:
-                Math.max(
-                    0.25,
-                    Math.min(
-                        Number(scaleInput.value) || 1,
-                        3
-                    )
-                ),
-
-            wrap:
-                wrapCheckbox.checked,
-
-            unlisted:
-                unlistedCheckbox.checked
+            background: backgroundCheckbox.checked,
+            backgroundColor: backgroundColorInput.value,
+            fade: noFade.checked ? false : Math.max(1, Number(fadeInput.value) || 15),
+            badges: badgesCheckbox.checked,
+            scale: Math.max(0.25, Math.min(Number(scaleInput.value) || 1, 3)),
+            wrap: wrapCheckbox.checked,
+            unlisted: unlistedCheckbox.checked,
+            font: fontSelect.value
         };
 
         const encodedSettings =
@@ -1956,6 +2046,10 @@ function showTwitchLoginScreen() {
     sidebar.appendChild(
         settings
     );
+
+    sidebar.appendChild(fontSectionTitle);
+    sidebar.appendChild(fontLabel);
+    sidebar.appendChild(fontSelect);
 
     sidebar.appendChild(
         animationTitle

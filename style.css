@@ -5,11 +5,12 @@ body {
     position: relative;
     flex-direction: column;
     background: transparent;
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--chat-font);
 }
 
 :root {
     --chat-scale: 1;
+    --chat-font: 'Open Sans', sans-serif;
     --bg-color-1: rgba(45, 12, 18, 0.9);
     --bg-color-2: rgba(65, 18, 25, 0.75);
 }
@@ -156,7 +157,7 @@ body.has-background .message.redeem-message:hover {
 }
 
 .username {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--chat-font);
     font-style: normal;
     font-size: 50px;
     font-weight: 900;
@@ -178,7 +179,7 @@ body.has-background .message.redeem-message:hover {
 
 .text {
     color: #FFFFFF;
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--chat-font);
     font-style: normal;
     font-size: 50px;
     font-weight: 900;
