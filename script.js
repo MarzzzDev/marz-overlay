@@ -126,9 +126,7 @@ function showLoadingIndicator() {
 
         color: #ffffff;
         font-family: Arial, Helvetica, sans-serif;
-        font-size: 13px;
-
-        background: rgba(0, 0, 0, 0.35);
+        font-size: 100px;
 
         pointer-events: none;
 
