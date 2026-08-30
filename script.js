@@ -677,7 +677,8 @@ async function ensureTwitchAuth() {
             return true;
         })();
 
-    return twitchAuthPromise;
+
+        return twitchAuthPromise;
 }
 
 async function loadPreviewEmotes() {
@@ -699,13 +700,57 @@ async function loadPreviewEmotes() {
 
 }
 
+async function loadPreviewEmotes() {
+    const previousChannel = CHANNEL;
+    const previousUserId = TWITCH_USER_ID;
+
+    CHANNEL = PREVIEW_CHANNEL;
+    TWITCH_USER_ID = PREVIEW_TWITCH_USER_ID;
+
+    const tasks = [
+        load7TVGlobalEmotes(),
+        load7TVEmotes(),
+        loadFFZEmotes(),
+        loadBTTVEmotes(),
+        loadFFZBadges(),
+        loadChatterinoBadges()
+    ];
+
+    if (accessToken) {
+        tasks.push(loadTwitchBadges());
+    }
+
+    await Promise.allSettled(tasks);
+
+    CHANNEL = previousChannel;
+    TWITCH_USER_ID = previousUserId;
+}
+
 const PREVIEW_CHANNEL = "marz_dev";
 const PREVIEW_TWITCH_USER_ID = "458139207";
 
 const previewMessages = [
-    ["Dodorej", "订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK ", "#FF0000", "504585840", "none"],
-    ["marz_dev", "wowie an overlay with support for ffz effects", "#FF0000", "1208634685", "none"],
-    ["XDR412", "DOVE! RAAAAAAH RAAAAAAH RAAAAAAH", "#eeff00", "195845559", "none"]
+    [
+        "Dodorej",
+        "订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK ...",
+        "#FF0000",
+        "504585840",
+        { badges: "subscriber/12" }
+    ],
+    [
+        "marz_dev",
+        "wowie an overlay with support for ffz effects",
+        "#FF0000",
+        "1208634685",
+        { badges: "broadcaster/1" }
+    ],
+    [
+        "XDR412",
+        "DOVE! RAAAAAAH RAAAAAAH RAAAAAAH",
+        "#DAA520",
+        "195845559",
+        { badges: "vip/1" }
+    ]
 ];
 
 let currentPreviewMessage = 0;
