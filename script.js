@@ -495,6 +495,11 @@ document.documentElement.style.setProperty("--chat-font", chatFont);
 loadGoogleFontIfNeeded(chatFont);
 loadCustomFontIfNeeded(chatFont);
 
+document.body.classList.toggle(
+    "pixel-font",
+    chatFont === "'Minecraft', sans-serif"
+);
+
 let wrapEnabled =
     overlaySettings.wrap === true;
 
@@ -1466,7 +1471,7 @@ function showTwitchLoginScreen() {
 
         document.documentElement.style.setProperty("--chat-font", chatFont);
 
-        loadGoogleFontIfNeeded(chatFont);
+        loadGoogleFontIfNeeded(chatFont);   
         loadCustomFontIfNeeded(chatFont);
 
         document.body.classList.toggle(
