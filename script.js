@@ -354,6 +354,26 @@ document.body.classList.toggle(
     backgroundEnabled
 );
 
+let backgroundColor =
+    typeof overlaySettings.backgroundColor === "string" &&
+    /^#[0-9a-fA-F]{6}$/.test(overlaySettings.backgroundColor)
+        ? overlaySettings.backgroundColor
+        : "#2d0c12";
+
+function applyBackgroundColor(hex) {
+    document.documentElement.style.setProperty(
+        "--bg-color-1",
+        hexToRgbaString(hex, 0.9)
+    );
+
+    document.documentElement.style.setProperty(
+        "--bg-color-2",
+        hexToRgbaString(hex, 0.75)
+    );
+}
+
+applyBackgroundColor(backgroundColor);
+
 let fade =
     overlaySettings.fade === false
         ? false
@@ -1165,6 +1185,111 @@ function showTwitchLoginScreen() {
             backgroundEnabled
         );
 
+    const backgroundColorRow =
+        document.createElement("div");
+
+    backgroundColorRow.style.cssText = `
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        height: 22px;
+
+        margin-top: -2px;
+        margin-left: 42px;
+    `;
+
+    const backgroundColorLabel =
+        document.createElement("span");
+
+    backgroundColorLabel.textContent =
+        "Color";
+
+    backgroundColorLabel.style.cssText = `
+        font-size: 11px;
+        color: #a8a8b3;
+    `;
+
+    const backgroundColorInput =
+        document.createElement("input");
+
+    backgroundColorInput.type =
+        "color";
+
+    backgroundColorInput.value =
+        backgroundColor;
+
+    backgroundColorInput.style.cssText = `
+        box-sizing: border-box;
+        -webkit-appearance: none;
+        appearance: none;
+
+        width: 40px;
+        height: 20px;
+
+        padding: 0;
+        border: 1px solid #46464f;
+        border-radius: 4px;
+
+        background: transparent;
+
+        cursor: pointer;
+    `;
+
+    const colorSwatchFix =
+        document.createElement("style");
+
+    colorSwatchFix.textContent = `
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 3px;
+        }
+        input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 3px;
+        }
+    `;
+
+    document.head.appendChild(colorSwatchFix);
+
+    function handleBackgroundColorChange() {
+        backgroundColor =
+            backgroundColorInput.value;
+
+        applyBackgroundColor(
+            backgroundColor
+        );
+        if (!backgroundCheckbox.checked) {
+            backgroundCheckbox.checked = true;
+            backgroundCheckbox.dispatchEvent(new Event("change"));
+        }
+    }
+
+    backgroundColorInput.addEventListener(
+        "input",
+        handleBackgroundColorChange
+    );
+
+    backgroundColorInput.addEventListener(
+        "change",
+        handleBackgroundColorChange
+    );
+
+    backgroundColorRow.appendChild(
+        backgroundColorLabel
+    );
+
+    backgroundColorRow.appendChild(
+        backgroundColorInput
+    );
+
+    settings.appendChild(
+        backgroundColorRow
+    );
+
     const wrapCheckbox =
         createToggle(
             "Wrap messages",
@@ -1522,14 +1647,15 @@ function showTwitchLoginScreen() {
             background:
                 backgroundCheckbox.checked,
 
+            backgroundColor:
+                backgroundColorInput.value,
+
             fade:
                 noFade.checked
                     ? false
                     : Math.max(
                         1,
-                        Number(
-                            fadeInput.value
-                        ) || 15
+                        Number(fadeInput.value) || 15
                     ),
 
             badges:
@@ -1539,9 +1665,7 @@ function showTwitchLoginScreen() {
                 Math.max(
                     0.25,
                     Math.min(
-                        Number(
-                            scaleInput.value
-                        ) || 1,
+                        Number(scaleInput.value) || 1,
                         3
                     )
                 ),
@@ -1870,7 +1994,6 @@ function showTwitchLoginScreen() {
     document.body.appendChild(
         screen
     );
-
     setTimeout(() => {
         runPreviewMessage();
     }, 3000);
