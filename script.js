@@ -88,6 +88,91 @@ const FFZ_EFFECT_FLAGS = Object.freeze({
     JAM: 32768,
     BOUNCE: 65536
 });
+const LOADING_TASKS = [
+    { label: "7TV global emotes", run: load7TVGlobalEmotes },
+    { label: "7TV channel emotes", run: load7TVEmotes },
+    { label: "Twitch emotes", run: loadTwitchEmotes },
+    { label: "FFZ emotes", run: loadFFZEmotes },
+    { label: "BTTV emotes", run: loadBTTVEmotes },
+    { label: "Twitch badges", run: loadTwitchBadges },
+    { label: "FFZ badges", run: loadFFZBadges },
+    { label: "Chatterino badges", run: loadChatterinoBadges }
+];
+
+function showLoadingIndicator() {
+    const chat = document.getElementById("chat");
+
+    if (!chat) {
+        return null;
+    }
+
+    if (getComputedStyle(chat).position === "static") {
+        chat.style.position = "relative";
+    }
+
+    const indicator = document.createElement("div");
+
+    indicator.id = "overlay-loading-indicator";
+
+    indicator.style.cssText = `
+        position: absolute;
+        inset: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 12px;
+
+        color: #ffffff;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 13px;
+
+        background: rgba(0, 0, 0, 0.35);
+
+        pointer-events: none;
+
+        z-index: 5;
+    `;
+
+    chat.appendChild(indicator);
+
+    return indicator;
+}
+
+async function runLoadingTasks(tasks) {
+    const indicator = showLoadingIndicator();
+    const pending = new Set(tasks.map(task => task.label));
+
+    function refresh() {
+        if (!indicator) {
+            return;
+        }
+
+        indicator.textContent = pending.size
+            ? `Loading ${[...pending].join(", ")}...`
+            : "Ready!";
+    }
+
+    refresh();
+
+    await Promise.allSettled(
+        tasks.map(task =>
+            task.run()
+                .catch(error => {
+                    console.error(`${task.label} failed to load:`, error);
+                })
+                .finally(() => {
+                    pending.delete(task.label);
+                    refresh();
+                })
+        )
+    );
+
+    if (indicator) {
+        indicator.remove();
+    }
+}
 
 let twemojiReady = null;
 
@@ -7581,25 +7666,18 @@ async function startOverlay() {
 
     if (!selectedChannel) {
         loadSavedTwitchAuth();
-
         showTwitchLoginScreen();
-
         return;
     }
 
-    const authenticated =
-        await ensureTwitchAuth();
+    const authenticated = await ensureTwitchAuth();
 
     if (!authenticated) {
-        console.log(
-            "Twitch authentication required."
-        );
-
+        console.log("Twitch authentication required.");
         return;
     }
 
-    const channelResolved =
-        await resolveOverlayChannel();
+    const channelResolved = await resolveOverlayChannel();
 
     if (!channelResolved) {
         return;
@@ -7607,34 +7685,12 @@ async function startOverlay() {
 
     hideTwitchLoginScreen();
 
-    Promise.allSettled([
-        load7TVGlobalEmotes(),
-        load7TVEmotes(),
-        loadTwitchEmotes(),
-        loadFFZEmotes(),
-        loadBTTVEmotes(),
-        loadExternalBadges()
-    ])
-        .then(() => {
-            console.log(
-                "Chat emotes and badge data loaded."
-            );
+    await runLoadingTasks(LOADING_TASKS);
 
-            console.log(
-                "Overlay channel:",
-                CHANNEL
-            );
-
-            console.log(
-                "Overlay channel ID:",
-                TWITCH_USER_ID
-            );
-
-            console.log(
-                "Authenticated reader:",
-                authenticatedUsername
-            );
-        });
+    console.log("Chat emotes and badge data loaded.");
+    console.log("Overlay channel:", CHANNEL);
+    console.log("Overlay channel ID:", TWITCH_USER_ID);
+    console.log("Authenticated reader:", authenticatedUsername);
 
     createEventSubSocket();
 
@@ -7644,8 +7700,7 @@ async function startOverlay() {
                 return;
             }
 
-            const valid =
-                await validateTwitchToken();
+            const valid = await validateTwitchToken();
 
             if (!valid) {
                 if (eventSubSocket) {
@@ -7658,7 +7713,6 @@ async function startOverlay() {
         5 * 60 * 1000
     );
 }
-
 startOverlay()
     .catch(error => {
         console.error(
