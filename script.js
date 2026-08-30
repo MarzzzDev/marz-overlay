@@ -1464,13 +1464,15 @@ function showTwitchLoginScreen() {
     fontSelect.addEventListener("change", () => {
         chatFont = fontSelect.value;
 
-        document.documentElement.style.setProperty(
-            "--chat-font",
-            chatFont
-        );
+        document.documentElement.style.setProperty("--chat-font", chatFont);
 
         loadGoogleFontIfNeeded(chatFont);
         loadCustomFontIfNeeded(chatFont);
+
+        document.body.classList.toggle(
+            "pixel-font",
+            chatFont === "'Minecraft', sans-serif"
+        );
     });
 
     const animationTitle =
