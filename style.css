@@ -16,22 +16,18 @@ body {
 }
 
 .message {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
     width: auto;
     max-width: 98%;
     box-sizing: border-box;
     margin: 0 0 3px 0;
     padding: 2px 12px 7px 12px;
     min-height: 74px;
-    line-height: 68px;
     border-radius: 14px;
     background: transparent;
-    border-left: none;
-    box-shadow: none;
     animation: messageIn 0.25s ease-out forwards;
-    white-space: normal;
-    overflow-wrap: normal;
-    word-break: normal;
 }
 
 .message.wrap-message {
@@ -50,7 +46,6 @@ body {
 body.pixel-font .text {
     font-weight: 400;
     line-height: 68px;
-    vertical-align: -14px;
 }
 body.has-background .message {
     background: linear-gradient(
