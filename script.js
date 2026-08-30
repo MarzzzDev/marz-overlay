@@ -688,16 +688,47 @@ async function loadPreviewEmotes() {
     CHANNEL = PREVIEW_CHANNEL;
     TWITCH_USER_ID = PREVIEW_TWITCH_USER_ID;
 
-    await Promise.allSettled([
+    seedPreviewTwitchBadges();
+
+    const tasks = [
         load7TVGlobalEmotes(),
         load7TVEmotes(),
         loadFFZEmotes(),
-        loadBTTVEmotes()
-    ]);
+        loadBTTVEmotes(),
+        loadFFZBadges(),
+        loadChatterinoBadges()
+    ];
+
+    if (accessToken) {
+        tasks.push(loadTwitchBadges());
+    }
+
+    await Promise.allSettled(tasks);
 
     CHANNEL = previousChannel;
     TWITCH_USER_ID = previousUserId;
+}
 
+const PREVIEW_TWITCH_BADGES = {
+    "48hgold/1": {
+        title: "Subtember",
+        url: "https://static-cdn.jtvnw.net/badges/v1/af11047c-a3b6-424d-808e-7fc7aaa0e74d/3"
+    },
+    "founder/1": {
+        title: "FOUNDER",
+        url: "https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/3"
+    },
+};
+
+function seedPreviewTwitchBadges() {
+    for (const [key, badge] of Object.entries(PREVIEW_TWITCH_BADGES)) {
+        twitchBadges.set(key, {
+            title: badge.title,
+            url_1x: badge.url,
+            url_2x: badge.url,
+            url_4x: badge.url
+        });
+    }
 }
 
 async function loadPreviewEmotes() {
@@ -732,10 +763,10 @@ const PREVIEW_TWITCH_USER_ID = "458139207";
 const previewMessages = [
     [
         "Dodorej",
-        "订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK ...",
+        "订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK",
         "#FF0000",
         "504585840",
-        { badges: "subscriber/12" }
+        { badges: "vip/1,founder/1,48hgold/1" }
     ],
     [
         "marz_dev",
