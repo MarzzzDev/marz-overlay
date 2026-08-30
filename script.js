@@ -422,7 +422,7 @@ const CHAT_FONTS = [
     { label: "Open Sans", value: "'Open Sans', sans-serif" },
     { label: "Arial", value: "Arial, sans-serif" },
     { label: "Impact", value: "Impact, sans-serif" },
-    { label: "Comic Sans MS", value: "'Comic Sans MS', cursive" },
+    { label: "Comic Sans (Comic Neue)", value: "'Comic Neue', cursive" },
     { label: "Georgia", value: "Georgia, serif" },
     { label: "Roboto", value: "'Roboto', sans-serif" },
     { label: "Montserrat", value: "'Montserrat', sans-serif" },
@@ -432,7 +432,8 @@ const CHAT_FONTS = [
 const GOOGLE_FONT_FAMILIES = {
     "'Roboto', sans-serif": "Roboto:wght@400;700;900",
     "'Montserrat', sans-serif": "Montserrat:wght@400;700;900",
-    "'Bangers', cursive": "Bangers"
+    "'Bangers', cursive": "Bangers",
+    "'Comic Neue', cursive": "Comic+Neue:wght@400;700"
 };
 
 const loadedGoogleFonts = new Set();
