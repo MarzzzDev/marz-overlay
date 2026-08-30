@@ -422,7 +422,7 @@ const CHAT_FONTS = [
     { label: "Open Sans", value: "'Open Sans', sans-serif" },
     { label: "Arial", value: "Arial, sans-serif" },
     { label: "Impact", value: "Impact, sans-serif" },
-    { label: "Comic Sans (Comic Neue)", value: "'Comic Neue', cursive" },
+    { label: "Comic Sans MS", value: "'Comic Sans MS', cursive" },
     { label: "Georgia", value: "Georgia, serif" },
     { label: "Roboto", value: "'Roboto', sans-serif" },
     { label: "Montserrat", value: "'Montserrat', sans-serif" },
@@ -432,8 +432,7 @@ const CHAT_FONTS = [
 const GOOGLE_FONT_FAMILIES = {
     "'Roboto', sans-serif": "Roboto:wght@400;700;900",
     "'Montserrat', sans-serif": "Montserrat:wght@400;700;900",
-    "'Bangers', cursive": "Bangers",
-    "'Comic Neue', cursive": "Comic+Neue:wght@400;700"
+    "'Bangers', cursive": "Bangers"
 };
 
 const loadedGoogleFonts = new Set();
@@ -453,6 +452,37 @@ function loadGoogleFontIfNeeded(fontValue) {
     document.head.appendChild(link);
 }
 
+const CUSTOM_FONT_FACES = {
+    "'Comic Sans MS', cursive": {
+        family: "Comic Sans MS",
+        url: "./fonts/COMIC.TTF"
+    }
+};
+
+const loadedCustomFonts = new Set();
+
+function loadCustomFontIfNeeded(fontValue) {
+    const fontFace = CUSTOM_FONT_FACES[fontValue];
+
+    if (!fontFace || loadedCustomFonts.has(fontFace.family)) {
+        return;
+    }
+
+    loadedCustomFonts.add(fontFace.family);
+
+    const style = document.createElement("style");
+
+    style.textContent = `
+        @font-face {
+            font-family: "${fontFace.family}";
+            src: url("${fontFace.url}") format("truetype");
+            font-display: swap;
+        }
+    `;
+
+    document.head.appendChild(style);
+}
+
 let chatFont =
     typeof overlaySettings.font === "string" &&
     overlaySettings.font.trim()
@@ -461,6 +491,7 @@ let chatFont =
 
 document.documentElement.style.setProperty("--chat-font", chatFont);
 loadGoogleFontIfNeeded(chatFont);
+loadCustomFontIfNeeded(chatFont);
 
 let wrapEnabled =
     overlaySettings.wrap === true;
@@ -1437,6 +1468,7 @@ function showTwitchLoginScreen() {
         );
 
         loadGoogleFontIfNeeded(chatFont);
+        loadCustomFontIfNeeded(chatFont);
     });
 
     const animationTitle =
