@@ -718,6 +718,18 @@ const PREVIEW_TWITCH_BADGES = {
         title: "Founder",
         url: "https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/3"
     },
+    "subtember/1": {
+        title: "Subtember",
+        url: "https://static-cdn.jtvnw.net/badges/v1/a9c01f28-179e-486d-a4c7-2277e4f6adb4/3"
+    },
+    "subscriber/1": {
+        title: "subscriber",
+        url: "https://static-cdn.jtvnw.net/badges/v1/3a37cb42-c1dc-48c1-9262-6266ca29ebf3/3"
+    },
+    "pikachu/1": {
+        title: "pikachu",
+        url: "https://static-cdn.jtvnw.net/badges/v1/20f214cf-36b0-4b42-8992-3b769bcb0461/3"
+    },
 };
 
 function seedPreviewTwitchBadges() {
@@ -745,16 +757,16 @@ const previewMessages = [
     [
         "marz_dev",
         "wowie an overlay with support for ffz effects",
-        "#FF0000",
+        "#8A2BE2",
         "1208634685",
-        { badges: "broadcaster/1" }
+        { badges: "broadcaster/1,subscriber/1,subtember/1" }
     ],
     [
         "XDR412",
         "DOVE! RAAAAAAH RAAAAAAH RAAAAAAH",
         "#DAA520",
         "195845559",
-        { badges: "vip/1" }
+        { badges: "vip/1,pikachu/1" }
     ]
 ];
 
@@ -1858,7 +1870,10 @@ function showTwitchLoginScreen() {
     document.body.appendChild(
         screen
     );
-    runPreviewMessage();
+
+    setTimeout(() => {
+        runPreviewMessage();
+    }, 3000);
 }
 
 
