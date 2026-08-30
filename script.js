@@ -100,22 +100,12 @@ const LOADING_TASKS = [
 ];
 
 function showLoadingIndicator() {
-    const chat = document.getElementById("chat");
-
-    if (!chat) {
-        return null;
-    }
-
-    if (getComputedStyle(chat).position === "static") {
-        chat.style.position = "relative";
-    }
-
     const indicator = document.createElement("div");
 
     indicator.id = "overlay-loading-indicator";
 
     indicator.style.cssText = `
-        position: absolute;
+        position: fixed;
         inset: 0;
 
         display: flex;
@@ -129,11 +119,10 @@ function showLoadingIndicator() {
         font-size: 100px;
 
         pointer-events: none;
-
-        z-index: 5;
+        z-index: 999999;
     `;
 
-    chat.appendChild(indicator);
+    document.body.appendChild(indicator);
 
     return indicator;
 }
