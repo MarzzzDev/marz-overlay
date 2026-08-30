@@ -711,11 +711,11 @@ async function loadPreviewEmotes() {
 
 const PREVIEW_TWITCH_BADGES = {
     "48hgold/1": {
-        title: "Subtember",
+        title: "48 Hour Sub Gold",
         url: "https://static-cdn.jtvnw.net/badges/v1/af11047c-a3b6-424d-808e-7fc7aaa0e74d/3"
     },
     "founder/1": {
-        title: "FOUNDER",
+        title: "Founder",
         url: "https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/3"
     },
 };
@@ -729,32 +729,6 @@ function seedPreviewTwitchBadges() {
             url_4x: badge.url
         });
     }
-}
-
-async function loadPreviewEmotes() {
-    const previousChannel = CHANNEL;
-    const previousUserId = TWITCH_USER_ID;
-
-    CHANNEL = PREVIEW_CHANNEL;
-    TWITCH_USER_ID = PREVIEW_TWITCH_USER_ID;
-
-    const tasks = [
-        load7TVGlobalEmotes(),
-        load7TVEmotes(),
-        loadFFZEmotes(),
-        loadBTTVEmotes(),
-        loadFFZBadges(),
-        loadChatterinoBadges()
-    ];
-
-    if (accessToken) {
-        tasks.push(loadTwitchBadges());
-    }
-
-    await Promise.allSettled(tasks);
-
-    CHANNEL = previousChannel;
-    TWITCH_USER_ID = previousUserId;
 }
 
 const PREVIEW_CHANNEL = "marz_dev";
