@@ -703,12 +703,9 @@ const PREVIEW_CHANNEL = "marz_dev";
 const PREVIEW_TWITCH_USER_ID = "458139207";
 
 const previewMessages = [
-    ["waustas", "Reacting wow this overlay sure is cool!", "#ffffff", "507853201", "none"],
-    ["JamiMeow", "hesRight ffzBounce", "#ffffff", "458139207", "none"],
+    ["Dodorej", "订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK ", "#FF0000", "504585840", "none"],
     ["marz_dev", "wowie an overlay with support for ffz effects", "#FF0000", "1208634685", "none"],
-    ["eyemLeonard", "Maybe I should use it", "#FF0000", "1071801594", "none"],
-    ["Underpaid_Actor", "i am underpaid and i am a dumbass", "#FF0000", "406239629", "none"],
-    ["Dodorej", "订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK 订阅层|成为订阅者您现在可以订阅并获得些额外福利包括徽章访问零宽度表情参与即将到来的全球表情抽奖等什么是是全新的表情服务和扩展免费提供自定7TV ffzCursed ffzW ffzSpin 7TV CHECK ", "#FF0000", "504585840", "none"]
+    ["XDR412", "DOVE! RAAAAAAH RAAAAAAH RAAAAAAH", "#eeff00", "195845559", "none"]
 ];
 
 let currentPreviewMessage = 0;
@@ -4041,6 +4038,46 @@ function createTwitchBadges(tags) {
     return container;
 }
 
+async function loadChatterinoBadges() {
+    try {
+        const response = await fetch("https://api.chatterino.com/badges");
+
+        if (!response.ok) {
+            throw new Error(`Chatterino badges: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        for (const badge of data.badges || []) {
+            const url = normalizeImageUrl(
+                badge.image3 || badge.image2 || badge.image1
+            );
+
+            if (!url) {
+                continue;
+            }
+
+            const title = badge.tooltip || "Chatterino Badge";
+
+            for (const rawId of badge.users || []) {
+                const id = String(rawId);
+
+                if (!chatterinoBadges.has(id)) {
+                    chatterinoBadges.set(id, []);
+                }
+
+                chatterinoBadges.get(id).push({ url, title });
+            }
+        }
+
+        console.log(
+            `Loaded Chatterino badges for ${chatterinoBadges.size} users.`
+        );
+
+    } catch (error) {
+        console.error("Chatterino badge error:", error);
+    }
+}
 
 function createFFZRoomBadge(tags) {
     const badgeString =
@@ -4440,6 +4477,37 @@ async function createExternalBadges(
                 });
             }
 
+
+            const chatterino =
+                chatterinoBadges.get(userId) || [];
+
+            for (
+                const badge
+                of chatterino
+            ) {
+                const image =
+                    await preloadBadgeImage(
+                        badge.url
+                    );
+
+                if (!image) {
+                    continue;
+                }
+
+                badges.push({
+                    url:
+                        badge.url,
+
+                    title:
+                        badge.title,
+
+                    provider:
+                        "Chatterino",
+
+                    type:
+                        null
+                });
+            }
 
             return badges;
         })();
