@@ -47,15 +47,11 @@ body {
     flex: none;
     margin: 0;
 }
-
 body.pixel-font .text {
     font-weight: 400;
     line-height: 68px;
-    vertical-align: middle;
-    display: inline-block;
-    transform: translateY(14px);
+    vertical-align: -14px;
 }
-
 body.has-background .message {
     background: linear-gradient(
         90deg,
