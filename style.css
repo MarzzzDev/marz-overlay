@@ -8,6 +8,7 @@ body {
     font-family: var(--chat-font);
 }
 
+
 :root {
     --chat-scale: 1;
     --chat-font: 'Open Sans', sans-serif;
