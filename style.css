@@ -30,13 +30,15 @@ body {
     box-shadow: none;
     animation: messageIn 0.25s ease-out forwards;
     white-space: normal;
-    overflow-wrap: normal;
-    word-break: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .message.wrap-message {
     width: auto;
     max-width: 98%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .message.wrap-message .text {
@@ -46,17 +48,25 @@ body {
     min-width: 0;
     flex: none;
     margin: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
+
 body.pixel-font .message {
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 body.pixel-font .text {
     font-weight: 400;
     line-height: 68px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
+
 body.has-background .message {
     background: linear-gradient(
         90deg,
@@ -104,8 +114,8 @@ body.has-background .message.redeem-message:hover {
     overflow: hidden;
     color: white;
     font-weight: 900;
-    word-break: normal;
-    overflow-wrap: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     white-space: normal;
     display: flex;
     flex-direction: column;
@@ -177,8 +187,8 @@ body.has-background .message.redeem-message:hover {
     vertical-align: middle;
     max-width: none;
     min-width: 0;
-    overflow-wrap: normal;
-    word-break: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     white-space: normal;
     color: #FF0000;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
@@ -199,8 +209,8 @@ body.has-background .message.redeem-message:hover {
     width: auto;
     max-width: none;
     min-width: 0;
-    overflow-wrap: normal;
-    word-break: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     white-space: normal;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
     text-rendering: geometricPrecision;
