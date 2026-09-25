@@ -18,6 +18,7 @@ let eventSubReconnectTimer = null;
 let twitchAuthPromise = null;
 
 const sevenTVEmotes = new Map();
+const sevenTVPersonalEmotes = new Map();
 const sevenTVUsers = new Map();
 
 const twitchBadges = new Map();
@@ -91,6 +92,7 @@ const FFZ_EFFECT_FLAGS = Object.freeze({
 const LOADING_TASKS = [
     { label: "7TV global emotes", run: load7TVGlobalEmotes },
     { label: "7TV channel emotes", run: load7TVEmotes },
+    { label: "7TV personal emotes", run: load7TVPersonalEmotes },
     { label: "Twitch emotes", run: loadTwitchEmotes },
     { label: "FFZ emotes", run: loadFFZEmotes },
     { label: "BTTV emotes", run: loadBTTVEmotes },
@@ -877,6 +879,7 @@ async function loadPreviewEmotes() {
     TWITCH_USER_ID = PREVIEW_TWITCH_USER_ID;
 
     seedPreviewTwitchBadges();
+    sevenTVPersonalEmotes.clear();
 
     const tasks = [
         load7TVGlobalEmotes(),
@@ -2673,6 +2676,174 @@ async function load7TVEmotes() {
     } catch (error) {
         console.error(
             "7TV emote error:",
+            error
+        );
+    }
+}
+
+
+async function load7TVPersonalEmotes() {
+    sevenTVPersonalEmotes.clear();
+
+    if (!authenticatedUserId) {
+        console.log(
+            "No authenticated Twitch user; skipping 7TV personal emotes."
+        );
+        return;
+    }
+
+    const query = `
+        query GetPersonalEmoteSets($userId: Id!) {
+            entitlements {
+                traverse(
+                    from: {
+                        id: $userId
+                        type: USER
+                    }
+                ) {
+                    nodes {
+                        ... on EntitlementNodeEmoteSet {
+                            emoteSet {
+                                id
+                                kind
+                                emotes(
+                                    page: 1
+                                    perPage: 100
+                                ) {
+                                    items {
+                                        alias
+                                        flags {
+                                            zeroWidth
+                                        }
+                                        emote {
+                                            id
+                                            defaultName
+                                            flags {
+                                                approvedPersonal
+                                                deniedPersonal
+                                                defaultZeroWidth
+                                                animated
+                                                publicListed
+                                            }
+                                            images {
+                                                url
+                                                scale
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    `;
+
+    try {
+        const response = await fetch(
+            "https://api.7tv.app/v4/gql",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    query,
+                    variables: {
+                        userId: String(authenticatedUserId)
+                    }
+                })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `7TV personal emotes HTTP error: ${response.status}`
+            );
+        }
+
+        const result = await response.json();
+
+        if (result.errors) {
+            console.error(
+                "7TV personal emotes GraphQL error:",
+                result.errors
+            );
+            return;
+        }
+
+        const nodes =
+            result.data?.entitlements?.traverse?.nodes || [];
+
+        const seenSets = new Set();
+
+        for (const node of nodes) {
+            const set = node?.emoteSet;
+
+            if (
+                !set ||
+                set.kind !== "PERSONAL" ||
+                !set.id ||
+                seenSets.has(String(set.id))
+            ) {
+                continue;
+            }
+
+            seenSets.add(String(set.id));
+
+            for (const entry of set.emotes?.items || []) {
+                const emote = entry?.emote;
+
+                if (
+                    !emote?.id ||
+                    !entry?.alias ||
+                    !emote.flags?.approvedPersonal ||
+                    emote.flags?.deniedPersonal
+                ) {
+                    continue;
+                }
+
+                const images = Array.isArray(emote.images)
+                    ? [...emote.images]
+                    : [];
+
+                images.sort(
+                    (a, b) =>
+                        Number(b?.scale || 0) -
+                        Number(a?.scale || 0)
+                );
+
+                const image = images[0];
+
+                if (!image?.url) {
+                    continue;
+                }
+
+                sevenTVPersonalEmotes.set(
+                    entry.alias,
+                    {
+                        id: String(emote.id),
+                        name: entry.alias,
+                        url: normalizeImageUrl(image.url),
+                        provider: "7TV",
+                        personal: true,
+                        listed: emote.flags.publicListed !== false,
+                        zeroWidth: Boolean(
+                            entry.flags?.zeroWidth ||
+                            emote.flags.defaultZeroWidth
+                        )
+                    }
+                );
+            }
+        }
+
+        console.log(
+            `Loaded ${sevenTVPersonalEmotes.size} 7TV personal emotes for ${authenticatedUsername || authenticatedUserId}.`
+        );
+    } catch (error) {
+        console.error(
+            "7TV personal emote error:",
             error
         );
     }
@@ -5568,7 +5739,32 @@ function getFFZModifierEffects(
     return effects;
 }
 
-function findThirdPartyEmote(word) {
+function findThirdPartyEmote(
+    word,
+    messageUserId = null
+) {
+    if (
+        messageUserId &&
+        authenticatedUserId &&
+        String(messageUserId) === String(authenticatedUserId) &&
+        sevenTVPersonalEmotes.has(word)
+    ) {
+        const personal = sevenTVPersonalEmotes.get(word);
+
+        if (
+            !showUnlisted7TV &&
+            personal.listed === false
+        ) {
+            return null;
+        }
+
+        return {
+            ...personal,
+            provider: "7TV",
+            personal: true
+        };
+    }
+
     if (
         sevenTVEmotes.has(
             word
@@ -5767,7 +5963,8 @@ function create7TVOverlay(
 
 function renderExternalText(
     container,
-    value
+    value,
+    messageUserId = null
 ) {
     const parts =
         value.split(
@@ -5806,7 +6003,8 @@ function renderExternalText(
 
         const external =
             findThirdPartyEmote(
-                part
+                part,
+                messageUserId
             );
 
         if (external) {
@@ -5987,6 +6185,10 @@ function renderMessageText(
     text,
     tags
 ) {
+    const messageUserId =
+        tags?.["user-id"] ||
+        null;
+
     const container =
         document.createElement(
             "span"
@@ -6003,7 +6205,8 @@ function renderMessageText(
     if (!twitchRanges.length) {
         renderExternalText(
             container,
-            text
+            text,
+            messageUserId
         );
 
         renderTwemoji(
@@ -6035,7 +6238,8 @@ function renderMessageText(
                 text.substring(
                     cursor,
                     range.start
-                )
+                ),
+                messageUserId
             );
         }
 
@@ -6086,7 +6290,8 @@ function renderMessageText(
             container,
             text.substring(
                 cursor
-            )
+            ),
+            messageUserId
         );
     }
 
@@ -6248,7 +6453,7 @@ function addPreviewMessage(
     tags = {}
 ) {
     const previewChat =
-        document.getElementById("chat");   // FIXED
+        document.getElementById("chat");
 
     if (!previewChat) {
         return;
