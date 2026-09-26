@@ -967,6 +967,7 @@ const CHAT_FONTS = [
 ];
 
 const GOOGLE_FONT_FAMILIES = {
+    "'Open Sans', sans-serif": "Open+Sans:wght@400;600;700;800;900",
     "'Roboto', sans-serif": "Roboto:wght@400;700;900",
     "'Montserrat', sans-serif": "Montserrat:wght@400;700;900",
     "'Bangers', cursive": "Bangers"
@@ -1442,1253 +1443,1413 @@ function runPreviewMessage() {
 
 
 function showTwitchLoginScreen() {
-    let screen =
-        document.getElementById(
-            "twitch-login-screen"
-        );
+    let screen = document.getElementById("twitch-login-screen");
 
     if (screen) {
         return;
     }
 
-    screen =
-        document.createElement("div");
+    screen = document.createElement("div");
+    screen.id = "twitch-login-screen";
 
-    screen.id =
-        "twitch-login-screen";
+    loadGoogleFontIfNeeded("'Open Sans', sans-serif");
 
-    screen.style.cssText = `
-        position: fixed;
-        inset: 0;
-        z-index: 999999;
+    const style = document.createElement("style");
+    style.dataset.marzSetup = "true";
+    style.textContent = `
+        html:has(#twitch-login-screen),
+        body:has(#twitch-login-screen) {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0b0b0e;
+        }
 
-        display: flex;
+        #twitch-login-screen {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80vw;
+            height: 80vh;
+            zoom: 1.25;
+            z-index: 999999;
+            display: grid;
+            grid-template-columns: 196px minmax(360px, 470px) minmax(0, 1fr);
+            grid-template-rows: 58px minmax(0, 1fr);
+            background: #0b0b0e;
+            color: #f4f4f5;
+            font-family: 'Open Sans', Arial, sans-serif;
+            overflow: hidden;
+        }
 
-        background: #18181b;
-        color: #ffffff;
+        /* Keep the 125% setup surface pinned to the viewport instead of exposing body edges. */
+        html:has(#twitch-login-screen),
+        body:has(#twitch-login-screen) {
+            scrollbar-width: none;
+        }
 
-        font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
+        html:has(#twitch-login-screen)::-webkit-scrollbar,
+        body:has(#twitch-login-screen)::-webkit-scrollbar {
+            display: none;
+        }
 
-        overflow: hidden;
+        #twitch-login-screen *,
+        #twitch-login-screen *::before,
+        #twitch-login-screen *::after {
+            box-sizing: border-box;
+        }
+
+        #twitch-login-screen button,
+        #twitch-login-screen input,
+        #twitch-login-screen select {
+            font: inherit;
+        }
+
+        #twitch-login-screen .mc-topbar {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            border-bottom: 1px solid #27272d;
+            background: #111114;
+        }
+
+        #twitch-login-screen .mc-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        #twitch-login-screen .mc-brand-mark {
+            height: 30px;
+            width: auto;
+            max-width: 96px;
+            display: block;
+            flex: 0 0 auto;
+            border-radius: 0;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        #twitch-login-screen .mc-brand-text {
+            min-width: 0;
+        }
+
+        #twitch-login-screen .mc-brand-name {
+            color: #fafafa;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: .02em;
+        }
+
+        #twitch-login-screen .mc-brand-m {
+            color: #f2df9b;
+        }
+
+        #twitch-login-screen .mc-brand-page {
+            margin-top: 3px;
+            color: #74747f;
+            font-size: 9px;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: .11em;
+        }
+
+        #twitch-login-screen .mc-top-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #868690;
+            font-size: 9px;
+            text-transform: none;
+            letter-spacing: .08em;
+        }
+
+        #twitch-login-screen .mc-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #3d3d45;
+        }
+
+        #twitch-login-screen .mc-sidebar {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 13px 10px;
+            border-right: 1px solid #27272d;
+            background: #101013;
+        }
+
+        #twitch-login-screen .mc-nav-label {
+            padding: 0 8px 8px;
+            color: #62626c;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .14em;
+            text-transform: none;
+        }
+
+        #twitch-login-screen .mc-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        #twitch-login-screen .mc-nav-button {
+            position: relative;
+            display: grid;
+            grid-template-columns: 24px 1fr;
+            align-items: center;
+            gap: 7px;
+            width: 100%;
+            min-height: 38px;
+            padding: 0 8px;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: #8c8c96;
+            text-align: left;
+            cursor: pointer;
+            transition: background .12s ease, color .12s ease;
+        }
+
+        #twitch-login-screen .mc-nav-button:hover {
+            background: #17171b;
+            color: #d8d8de;
+        }
+
+        #twitch-login-screen .mc-nav-button.is-active {
+            background: #2a271d;
+            color: #f0e9f8;
+        }
+
+        #twitch-login-screen .mc-nav-button.is-active::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            border-radius: 2px;
+            background: #e8d58a;
+        }
+
+        #twitch-login-screen .mc-nav-icon {
+            width: 24px;
+            color: #66666f;
+            font-size: 10px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        #twitch-login-screen .mc-nav-button.is-active .mc-nav-icon {
+            color: #f2df9b;
+        }
+
+        #twitch-login-screen .mc-nav-copy {
+            min-width: 0;
+        }
+
+        #twitch-login-screen .mc-nav-title {
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        #twitch-login-screen .mc-side-spacer {
+            flex: 1;
+        }
+
+        #twitch-login-screen .mc-side-hint {
+            padding: 9px 8px;
+            border-top: 1px solid #222228;
+            color: #5d5d67;
+            font-size: 8px;
+            line-height: 1.5;
+        }
+
+        #twitch-login-screen .mc-controls {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: #0f0f12;
+            border-right: 1px solid #27272d;
+        }
+
+        #twitch-login-screen .mc-controls-head {
+            padding: 18px 18px 15px;
+            border-bottom: 1px solid #27272d;
+        }
+
+        #twitch-login-screen .mc-control-title {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -.02em;
+        }
+
+        #twitch-login-screen .mc-control-subtitle {
+            margin: 5px 0 0;
+            color: #686872;
+            font-size: 9px;
+            line-height: 1.45;
+        }
+
+        #twitch-login-screen .mc-panel-stack {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            padding: 14px 18px 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #34343c transparent;
+        }
+
+        #twitch-login-screen .mc-panel {
+            display: none;
+        }
+
+        #twitch-login-screen .mc-panel.is-active {
+            display: block;
+        }
+
+        #twitch-login-screen .mc-field {
+            margin-bottom: 15px;
+        }
+
+        #twitch-login-screen .mc-field:last-child {
+            margin-bottom: 0;
+        }
+
+        #twitch-login-screen .mc-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #b9b9c1;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .05em;
+            text-transform: none;
+        }
+
+        #twitch-login-screen .mc-input,
+        #twitch-login-screen .mc-select {
+            width: 100%;
+            height: 34px;
+            padding: 0 10px;
+            border: 1px solid #32323a;
+            border-radius: 5px;
+            background: #0a0a0d;
+            color: #f6f6f7;
+            outline: none;
+            font-size: 10px;
+            transition: border-color .12s ease, background .12s ease;
+        }
+
+        #twitch-login-screen .mc-input:hover,
+        #twitch-login-screen .mc-select:hover {
+            border-color: #45454f;
+        }
+
+        #twitch-login-screen .mc-input:focus,
+        #twitch-login-screen .mc-select:focus {
+            border-color: #e8d58a;
+            background: #0d0c10;
+        }
+
+        #twitch-login-screen .mc-inline {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #twitch-login-screen .mc-status-pill {
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 10px;
+            border: 1px solid #32323a;
+            border-radius: 5px;
+            background: #0a0a0d;
+            color: #6d6d77;
+            font-size: 8px;
+            white-space: nowrap;
+        }
+
+        #twitch-login-screen .mc-status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #3d3d45;
+        }
+
+        #twitch-login-screen .mc-status-pill.is-connected {
+            color: #9cdeb0;
+        }
+
+        #twitch-login-screen .mc-status-pill.is-connected .dot {
+            background: #35c759;
+        }
+
+        #twitch-login-screen .mc-divider {
+            height: 1px;
+            margin: 17px 0;
+            background: #24242a;
+        }
+
+        #twitch-login-screen .mc-subhead {
+            margin: 0 0 9px;
+            color: #777781;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: none;
+        }
+
+        #twitch-login-screen .mc-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 40px;
+            padding: 0 10px;
+            margin-bottom: 4px;
+            border: 1px solid #25252b;
+            border-radius: 5px;
+            background: #121216;
+            cursor: pointer;
+            user-select: none;
+            transition: border-color .12s ease, background .12s ease;
+        }
+
+        #twitch-login-screen .mc-toggle-row:hover {
+            border-color: #33333a;
+            background: #151519;
+        }
+
+        #twitch-login-screen .mc-toggle-copy {
+            min-width: 0;
+        }
+
+        #twitch-login-screen .mc-toggle-title {
+            color: #d5d5db;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        #twitch-login-screen .mc-toggle-note {
+            margin-top: 2px;
+            color: #5e5e68;
+            font-size: 8px;
+            line-height: 1.3;
+        }
+
+        #twitch-login-screen .mc-check {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #twitch-login-screen .mc-switch {
+            width: 31px;
+            height: 18px;
+            flex: 0 0 auto;
+            position: relative;
+            border-radius: 999px;
+            background: #36363e;
+            transition: background .12s ease;
+        }
+
+        #twitch-login-screen .mc-switch::after {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            top: 2px;
+            left: 2px;
+            border-radius: 50%;
+            background: #ececf0;
+            transition: transform .12s ease;
+        }
+
+        #twitch-login-screen .mc-toggle-row.is-on .mc-switch {
+            background: #e8d58a;
+        }
+
+        #twitch-login-screen .mc-toggle-row.is-on .mc-switch::after {
+            transform: translateX(13px);
+        }
+
+        #twitch-login-screen .mc-color-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 86px;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px 9px;
+            margin: -4px 0 4px;
+            border: 1px solid #24242a;
+            border-top: 0;
+            border-radius: 0 0 5px 5px;
+            background: #0e0e11;
+        }
+
+        #twitch-login-screen .mc-muted {
+            color: #62626b;
+            font-size: 8px;
+        }
+
+        #twitch-login-screen .mc-color {
+            width: 86px;
+            height: 24px;
+            padding: 1px;
+            border: 1px solid #36363e;
+            border-radius: 4px;
+            background: #0a0a0d;
+            cursor: pointer;
+        }
+
+        #twitch-login-screen .mc-color::-webkit-color-swatch-wrapper { padding: 0; }
+        #twitch-login-screen .mc-color::-webkit-color-swatch { border: 0; border-radius: 3px; }
+        #twitch-login-screen .mc-color::-moz-color-swatch { border: 0; border-radius: 3px; }
+
+        #twitch-login-screen .mc-two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        #twitch-login-screen .mc-range-line {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 72px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #twitch-login-screen .mc-unit {
+            color: #65656e;
+            font-size: 8px;
+        }
+
+        #twitch-login-screen .mc-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid #25252b;
+        }
+
+        #twitch-login-screen .mc-button {
+            height: 35px;
+            border: 1px solid #35353d;
+            border-radius: 5px;
+            background: #19191e;
+            color: #dcdce1;
+            font-size: 9px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background .12s ease, border-color .12s ease, color .12s ease;
+        }
+
+        #twitch-login-screen .mc-button:hover {
+            background: #212127;
+            border-color: #484850;
+            color: #fff;
+        }
+
+        #twitch-login-screen .mc-button-primary {
+            border-color: #e8d58a;
+            background: #e8d58a;
+            color: #fff;
+        }
+
+        #twitch-login-screen .mc-button-primary:hover {
+            background: #d2be70;
+            border-color: #d2be70;
+        }
+
+        #twitch-login-screen .mc-button-full {
+            grid-column: 1 / -1;
+        }
+
+        #twitch-login-screen .mc-footnote {
+            margin-top: 9px;
+            color: #55555e;
+            font-size: 8px;
+            line-height: 1.45;
+            text-align: center;
+        }
+
+        #twitch-login-screen .mc-error {
+            display: none;
+            margin-top: 9px;
+            padding: 8px 9px;
+            border: 1px solid rgba(239, 68, 68, .28);
+            border-radius: 5px;
+            background: rgba(239, 68, 68, .08);
+            color: #f08a8a;
+            font-size: 8px;
+            line-height: 1.4;
+        }
+
+        #twitch-login-screen .mc-stage {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: #09090c;
+        }
+
+        #twitch-login-screen .mc-stage-head {
+            height: 44px;
+            flex: 0 0 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-bottom: 1px solid #27272d;
+            background: #0e0e11;
+        }
+
+        #twitch-login-screen .mc-stage-title {
+            color: #a6a6af;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: none;
+        }
+
+        #twitch-login-screen .mc-stage-meta {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #5c5c66;
+            font-size: 8px;
+        }
+
+        #twitch-login-screen .mc-stage-meta strong {
+            color: #8b8b95;
+            font-weight: 700;
+        }
+
+        #twitch-login-screen .mc-stage-canvas {
+            position: relative;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        #twitch-login-screen .mc-stage-canvas::before {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+        }
+
+        #twitch-login-screen .mc-stage-canvas::before {
+            inset: 0;
+            opacity: .33;
+            background-image:
+                linear-gradient(#1f1f24 1px, transparent 1px),
+                linear-gradient(90deg, #1f1f24 1px, transparent 1px);
+            background-size: 36px 36px;
+            mask-image: radial-gradient(circle at 50% 45%, black 0%, transparent 80%);
+        }
+
+        #twitch-login-screen .mc-preview-frame {
+            position: relative;
+            z-index: 1;
+            width: min(760px, calc(100% - 40px));
+            height: min(720px, calc(100% - 40px));
+            min-width: 0;
+            min-height: 0;
+            max-width: 100%;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow: hidden;
+            border: 1px solid #34343c;
+            border-radius: 8px;
+            background: #111116;
+            box-shadow: none;
+        }
+
+        #twitch-login-screen .mc-preview-corner {
+            position: absolute;
+            inset: 10px 10px auto auto;
+            z-index: 3;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 8px;
+            border: 1px solid #2d2d34;
+            border-radius: 4px;
+            background: rgba(7,7,10,.72);
+            color: #676770;
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: .09em;
+            text-transform: none;
+            backdrop-filter: none;
+        }
+
+        #twitch-login-screen .mc-preview-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #35c759;
+        }
+
+        #twitch-login-screen #chat.mc-preview-chat {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            overflow-y: auto;
+            padding: 22px;
+            scrollbar-width: none;
+        }
+
+        #twitch-login-screen #chat.mc-preview-chat::-webkit-scrollbar {
+            display: none;
+        }
+
+        #twitch-login-screen .mc-preview-note {
+            position: absolute;
+            z-index: 2;
+            left: 22px;
+            bottom: 18px;
+            color: #4e4e57;
+            font-size: 7px;
+            letter-spacing: .08em;
+            text-transform: none;
+            pointer-events: none;
+        }
+
+        #twitch-login-screen .mc-stage-help {
+            position: absolute;
+            right: 34px;
+            bottom: 22px;
+            z-index: 2;
+            max-width: 220px;
+            color: #4e4e57;
+            font-size: 7px;
+            line-height: 1.45;
+            text-align: right;
+        }
+
+        #twitch-login-screen .mc-nav-title {
+            font-size: 12px;
+        }
+
+        #twitch-login-screen .mc-brand-name {
+            font-size: 14px;
+        }
+
+        #twitch-login-screen .mc-brand-page {
+            font-size: 10px;
+        }
+
+        #twitch-login-screen .mc-control-title {
+            font-size: 18px;
+        }
+
+        #twitch-login-screen .mc-control-subtitle,
+        #twitch-login-screen .mc-label,
+        #twitch-login-screen .mc-input,
+        #twitch-login-screen .mc-select,
+        #twitch-login-screen .mc-toggle-title,
+        #twitch-login-screen .mc-button {
+            font-size: 11px;
+        }
+
+        #twitch-login-screen .mc-toggle-note,
+        #twitch-login-screen .mc-muted,
+        #twitch-login-screen .mc-footnote {
+            font-size: 9px;
+        }
+
+        @media (max-width: 1020px) {
+            #twitch-login-screen {
+                grid-template-columns: 176px minmax(330px, 420px) minmax(0, 1fr);
+            }
+
+            #twitch-login-screen .mc-stage-canvas {
+                padding: 14px;
+            }
+        }
+
+        @media (max-width: 780px) {
+            #twitch-login-screen {
+                grid-template-columns: 1fr;
+                grid-template-rows: 58px auto minmax(320px, 1fr);
+                overflow-y: auto;
+            }
+
+            #twitch-login-screen .mc-sidebar {
+                min-height: auto;
+                border-right: 0;
+                border-bottom: 1px solid #27272d;
+            }
+
+            #twitch-login-screen .mc-nav {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            #twitch-login-screen .mc-nav-button {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                gap: 2px;
+                min-height: 46px;
+                text-align: center;
+            }
+
+            #twitch-login-screen .mc-nav-button.is-active::before {
+                left: 12px;
+                right: 12px;
+                top: auto;
+                bottom: 0;
+                width: auto;
+                height: 2px;
+            }
+
+            #twitch-login-screen .mc-side-spacer,
+            #twitch-login-screen .mc-side-hint {
+                display: none;
+            }
+
+            #twitch-login-screen .mc-controls {
+                border-right: 0;
+                border-bottom: 1px solid #27272d;
+            }
+
+            #twitch-login-screen .mc-panel-stack {
+                max-height: 430px;
+            }
+
+            #twitch-login-screen .mc-stage {
+                min-height: 430px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            #twitch-login-screen .mc-two-col,
+            #twitch-login-screen .mc-actions {
+                grid-template-columns: 1fr;
+            }
+
+            #twitch-login-screen .mc-button-full {
+                grid-column: auto;
+            }
+
+            #twitch-login-screen .mc-preview-frame {
+                width: 100%;
+                height: calc(100% - 20px);
+            }
+
+            #twitch-login-screen .mc-stage-help {
+                display: none;
+            }
+        }
     `;
 
-    const sidebar =
-        document.createElement("div");
+    screen.appendChild(style);
 
-    sidebar.style.cssText = `
-        width: 292px;
-        min-width: 292px;
-        height: 100vh;
+    const topbar = document.createElement("header");
+    topbar.className = "mc-topbar";
 
-        box-sizing: border-box;
+    const brand = document.createElement("div");
+    brand.className = "mc-brand";
 
-        padding: 24px 19px 18px;
+    const brandMark = document.createElement("img");
+    brandMark.className = "mc-brand-mark";
+    brandMark.src = "waga.gif";
+    brandMark.alt = "Waga";
+    brandMark.draggable = false;
 
-        background: #202024;
+    const brandText = document.createElement("div");
+    brandText.className = "mc-brand-text";
 
-        border-right:
-            1px solid #35353b;
+    const brandName = document.createElement("div");
+    brandName.className = "mc-brand-name";
 
-        overflow-y: auto;
-    `;
+    const brandM = document.createElement("span");
+    brandM.className = "mc-brand-m";
+    brandM.textContent = "M";
 
-    const preview =
-        document.createElement("div");
+    brandName.appendChild(brandM);
+    brandName.appendChild(document.createTextNode("Chat"));
 
-    preview.style.cssText = `
-        flex: 1;
-        min-width: 0;
-        height: 100vh;
+    const brandPage = document.createElement("div");
+    brandPage.className = "mc-brand-page";
+    brandPage.textContent = "The most up-to-date Twitch chat Overlay";
 
-        background: #18181b;
+    brandText.appendChild(brandName);
+    brandText.appendChild(brandPage);
+    brand.appendChild(brandMark);
+    brand.appendChild(brandText);
 
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    `;
+    topbar.appendChild(brand);
+    const sidebar = document.createElement("aside");
+    sidebar.className = "mc-sidebar";
 
-    let previewChat =
-        document.getElementById("chat");
+    const navLabel = document.createElement("div");
+    navLabel.className = "mc-nav-label";
+    navLabel.textContent = "Setup";
+
+    const nav = document.createElement("nav");
+    nav.className = "mc-nav";
+
+    sidebar.appendChild(navLabel);
+    sidebar.appendChild(nav);
+
+    const spacer = document.createElement("div");
+    spacer.className = "mc-side-spacer";
+    sidebar.appendChild(spacer);
+
+    const hint = document.createElement("div");
+    hint.className = "mc-side-hint";
+    hint.textContent = "Changes update the renderer immediately. Preview will look 1:1 in your stream. (unless you change the aspect ratio in obs)";
+    sidebar.appendChild(hint);
+
+    const controls = document.createElement("main");
+    controls.className = "mc-controls";
+
+    const controlsHead = document.createElement("div");
+    controlsHead.className = "mc-controls-head";
+
+    const controlTitle = document.createElement("h1");
+    controlTitle.className = "mc-control-title";
+    controlTitle.textContent = "Overlay setup";
+
+    const controlSubtitle = document.createElement("p");
+    controlSubtitle.className = "mc-control-subtitle";
+    controlSubtitle.textContent = "Tune the renderer without leaving the preview.";
+
+    controlsHead.appendChild(controlTitle);
+    controlsHead.appendChild(controlSubtitle);
+
+    const panelStack = document.createElement("div");
+    panelStack.className = "mc-panel-stack";
+
+    controls.appendChild(controlsHead);
+    controls.appendChild(panelStack);
+
+    const stage = document.createElement("section");
+    stage.className = "mc-stage";
+
+    const stageHead = document.createElement("div");
+    stageHead.className = "mc-stage-head";
+
+    const stageTitle = document.createElement("div");
+    stageTitle.className = "mc-stage-title";
+    stageTitle.textContent = "Renderer preview";
+
+    const stageMeta = document.createElement("div");
+    stageMeta.className = "mc-stage-meta";
+
+    stageHead.appendChild(stageTitle);
+    stageHead.appendChild(stageMeta);
+
+    const stageCanvas = document.createElement("div");
+    stageCanvas.className = "mc-stage-canvas";
+
+    const previewFrame = document.createElement("div");
+    previewFrame.className = "mc-preview-frame";
+
+    let previewChat = document.getElementById("chat");
 
     if (!previewChat) {
-        previewChat =
-            document.createElement("div");
-
+        previewChat = document.createElement("div");
         previewChat.id = "chat";
     }
 
-    previewChat.dataset.originalPosition =
-        previewChat.style.position || "";
-    previewChat.dataset.originalInset =
-        previewChat.style.inset || "";
-    previewChat.dataset.originalTop =
-        previewChat.style.top || "";
-    previewChat.dataset.originalLeft =
-        previewChat.style.left || "";
-    previewChat.dataset.originalRight =
-        previewChat.style.right || "";
-    previewChat.dataset.originalBottom =
-        previewChat.style.bottom || "";
-    previewChat.dataset.originalWidth =
-        previewChat.style.width || "";
-    previewChat.dataset.originalHeight =
-        previewChat.style.height || "";
-    previewChat.dataset.originalZIndex =
-        previewChat.style.zIndex || "";
+    const originalKeys = [
+        "position", "inset", "top", "left", "right", "bottom",
+        "width", "height", "zIndex", "flex", "minHeight",
+        "overflowY", "display", "flexDirection", "justifyContent",
+        "padding"
+    ];
 
+    for (const key of originalKeys) {
+        previewChat.dataset[`original${key.charAt(0).toUpperCase()}${key.slice(1)}`] = previewChat.style[key] || "";
+    }
 
+    previewChat.classList.add("mc-preview-chat");
     previewChat.style.position = "relative";
     previewChat.style.inset = "auto";
     previewChat.style.top = "auto";
     previewChat.style.left = "auto";
     previewChat.style.right = "auto";
     previewChat.style.bottom = "auto";
-    previewChat.style.width = "98%";  
-    previewChat.style.height = "auto";
+    previewChat.style.width = "100%";
+    previewChat.style.height = "100%";
     previewChat.style.zIndex = "auto";
-
     previewChat.style.flex = "1";
     previewChat.style.minHeight = "0";
     previewChat.style.overflowY = "auto";
     previewChat.style.display = "flex";
     previewChat.style.flexDirection = "column";
     previewChat.style.justifyContent = "flex-end";
-
+    previewChat.style.padding = "22px";
     previewChat.innerHTML = "";
 
-    preview.appendChild(previewChat);
-
-    loadPreviewEmotes();
-
-    const title =
-        document.createElement("div");
-
-    title.textContent =
-        "Marz' Chat Overlay";
-
-    title.style.cssText = `
-        font-size: 19px;
-        font-weight: 700;
-
-        color: #ffffff;
-
-        margin-bottom: 4px;
-    `;
-
-    const description =
-        document.createElement("div");
-
-    description.textContent =
-        "Configure your Twitch chat overlay.";
-
-    description.style.cssText = `
-        font-size: 12px;
-
-        color: #a8a8b3;
-
-        margin-bottom: 18px;
-    `;
-
-    const channelLabel =
-        document.createElement("label");
-
-    channelLabel.textContent =
-        "Twitch Channel";
-
-    channelLabel.style.cssText = `
-        display: block;
-
-        font-size: 12px;
-        font-weight: 600;
-
-        color: #e2e2e8;
-
-        margin-bottom: 6px;
-    `;
-
-    const channelInput =
-        document.createElement("input");
-
-    channelInput.type =
-        "text";
-
-    channelInput.placeholder =
-        "channelname";
-
-    channelInput.value =
-        selectedChannel || "";
-
-    channelInput.autocomplete =
-        "off";
-
-    channelInput.spellcheck =
-        false;
-
-    channelInput.style.cssText = `
-        width: 100%;
-        height: 32px;
-
-        box-sizing: border-box;
-
-        padding: 0 10px;
-
-        border:
-            1px solid #46464f;
-
-        border-radius: 6px;
-
-        background: #151518;
-
-        color: #ffffff;
-
-        outline: none;
-
-        font-size: 12px;
-
-        transition:
-            border-color .15s ease;
-    `;
-
-    const settingsTitle =
-        document.createElement("div");
-
-    settingsTitle.textContent =
-        "Overlay Settings";
-
-    settingsTitle.style.cssText = `
-        margin-top: 17px;
-        margin-bottom: 9px;
-
-        font-size: 12px;
-        font-weight: 600;
-
-        color: #e2e2e8;
-    `;
-
-    const settings =
-        document.createElement("div");
-
-    settings.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    `;
-
-    function createToggle(
-        label,
-        key,
-        checked
-    ) {
-        const wrapper =
-            document.createElement("label");
-
-        wrapper.style.cssText = `
-            display: flex;
-            align-items: center;
-
-            gap: 8px;
-
-            height: 20px;
-
-            cursor: pointer;
-
-            font-size: 12px;
-
-            color: #d8d8df;
-
-            user-select: none;
-        `;
-
-        const checkbox =
-            document.createElement("input");
-
-        checkbox.type =
-            "checkbox";
-
-        checkbox.checked =
-            checked;
-
-        checkbox.dataset.setting =
-            key;
-
-        checkbox.style.cssText = `
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        `;
-
-        const toggle =
-            document.createElement("span");
-
-        toggle.style.cssText = `
-            width: 34px;
-            height: 18px;
-
-            border-radius: 20px;
-
-            background:
-                ${checked
-                    ? "#9147ff"
-                    : "#4a4a52"};
-
-            position: relative;
-
-            flex-shrink: 0;
-
-            transition:
-                background .15s ease;
-        `;
-
-        const knob =
-            document.createElement("span");
-
-        knob.style.cssText = `
-            position: absolute;
-
-            width: 14px;
-            height: 14px;
-
-            border-radius: 50%;
-
-            background: #ffffff;
-
-            left: 2px;
-            top: 2px;
-
-            pointer-events: none;
-
-            transition:
-                transform .15s ease;
-        `;
-
-        knob.style.transform =
-            checked
-                ? "translateX(16px)"
-                : "translateX(0)";
-
-        toggle.appendChild(
-            knob
-        );
-
-        checkbox.addEventListener(
-            "change",
-            () => {
-                toggle.style.background =
-                    checkbox.checked
-                        ? "#9147ff"
-                        : "#4a4a52";
-
-                knob.style.transform =
-                    checkbox.checked
-                        ? "translateX(16px)"
-                        : "translateX(0)";
+    previewFrame.appendChild(previewChat);
+    stageCanvas.appendChild(previewFrame);
+
+    stage.appendChild(stageHead);
+    stage.appendChild(stageCanvas);
+
+    screen.appendChild(topbar);
+    screen.appendChild(sidebar);
+    screen.appendChild(controls);
+    screen.appendChild(stage);
+    document.body.appendChild(screen);
+
+    function createPanel(id, navTitle, navDesc, icon) {
+        const panel = document.createElement("section");
+        panel.className = "mc-panel";
+        panel.dataset.panel = id;
+
+        const navButton = document.createElement("button");
+        navButton.type = "button";
+        navButton.className = "mc-nav-button";
+        navButton.dataset.panel = id;
+
+        const navIcon = document.createElement("span");
+        navIcon.className = "mc-nav-icon";
+        navIcon.textContent = icon;
+
+        const navCopy = document.createElement("span");
+        navCopy.className = "mc-nav-copy";
+
+        const title = document.createElement("span");
+        title.className = "mc-nav-title";
+        title.textContent = navTitle;
+
+        navCopy.appendChild(title);
+        navButton.appendChild(navIcon);
+        navButton.appendChild(navCopy);
+        nav.appendChild(navButton);
+        panelStack.appendChild(panel);
+
+        navButton.addEventListener("click", () => {
+            for (const button of nav.querySelectorAll(".mc-nav-button")) {
+                button.classList.toggle("is-active", button === navButton);
             }
-        );
 
-        const text =
-            document.createElement("span");
+            for (const otherPanel of panelStack.querySelectorAll(".mc-panel")) {
+                otherPanel.classList.toggle("is-active", otherPanel === panel);
+            }
 
-        text.textContent =
-            label;
+            controlTitle.textContent = navTitle;
+            controlSubtitle.textContent = navDesc;
+        });
 
-        wrapper.appendChild(
-            checkbox
-        );
+        return panel;
+    }
 
-        wrapper.appendChild(
-            toggle
-        );
+    function addField(parent, labelText, control) {
+        const field = document.createElement("div");
+        field.className = "mc-field";
 
-        wrapper.appendChild(
-            text
-        );
+        const label = document.createElement("label");
+        label.className = "mc-label";
+        label.textContent = labelText;
 
-        settings.appendChild(
-            wrapper
-        );
+        field.appendChild(label);
+        field.appendChild(control);
+        parent.appendChild(field);
+
+        return field;
+    }
+
+    function addToggle(parent, labelText, noteText, key, checked) {
+        const wrapper = document.createElement("label");
+        wrapper.className = `mc-toggle-row${checked ? " is-on" : ""}`;
+
+        const copy = document.createElement("div");
+        copy.className = "mc-toggle-copy";
+
+        const title = document.createElement("div");
+        title.className = "mc-toggle-title";
+        title.textContent = labelText;
+
+        const note = document.createElement("div");
+        note.className = "mc-toggle-note";
+        note.textContent = noteText;
+
+        copy.appendChild(title);
+        copy.appendChild(note);
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = checked;
+        checkbox.dataset.setting = key;
+        checkbox.className = "mc-check";
+
+        const sw = document.createElement("span");
+        sw.className = "mc-switch";
+
+        wrapper.appendChild(copy);
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(sw);
+        parent.appendChild(wrapper);
+
+        checkbox.addEventListener("change", () => {
+            wrapper.classList.toggle("is-on", checkbox.checked);
+        });
 
         return checkbox;
     }
 
-    const backgroundCheckbox =
-        createToggle(
-            "Background",
-            "background",
-            backgroundEnabled
-        );
+    const connectionPanel = createPanel("connection", "Connection", "Choose the channel this overlay should read from and authorize Twitch when needed.", "01");
 
-    const backgroundColorRow =
-        document.createElement("div");
+    const channelInput = document.createElement("input");
+    channelInput.type = "text";
+    channelInput.className = "mc-input";
+    channelInput.placeholder = "channelname";
+    channelInput.value = selectedChannel || "";
+    channelInput.autocomplete = "off";
+    channelInput.spellcheck = false;
 
-    backgroundColorRow.style.cssText = `
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    const channelInline = document.createElement("div");
+    channelInline.className = "mc-inline";
+    channelInline.appendChild(channelInput);
 
-        height: 22px;
+    const statusPill = document.createElement("div");
+    statusPill.className = `mc-status-pill${accessToken ? " is-connected" : ""}`;
+    const statusDot = document.createElement("span");
+    statusDot.className = "dot";
+    const statusText = document.createElement("span");
+    statusText.textContent = accessToken ? "Authorized" : "Not authorized";
+    statusPill.appendChild(statusDot);
+    statusPill.appendChild(statusText);
 
-        margin-top: -2px;
-        margin-left: 42px;
-    `;
+    channelInline.appendChild(statusPill);
+    addField(connectionPanel, "Twitch channel", channelInline);
 
-    const backgroundColorLabel =
-        document.createElement("span");
+    const connectionDivider = document.createElement("div");
+    connectionDivider.className = "mc-divider";
+    connectionPanel.appendChild(connectionDivider);
 
-    backgroundColorLabel.textContent =
-        "Color";
+    const connectionSub = document.createElement("h2");
+    connectionSub.className = "mc-subhead";
+    connectionSub.textContent = "Browser source";
+    connectionPanel.appendChild(connectionSub);
 
-    backgroundColorLabel.style.cssText = `
-        font-size: 11px;
-        color: #a8a8b3;
-    `;
+    const connectionText = document.createElement("div");
+    connectionText.className = "mc-muted";
+    connectionText.textContent = "Generate one URL with the current overlay settings. Paste it into an OBS Browser Source.";
+    connectionText.style.lineHeight = "1.55";
+    connectionPanel.appendChild(connectionText);
 
-    const backgroundColorInput =
-        document.createElement("input");
+    const appearancePanel = createPanel("appearance", "Appearance", "Control the visual density of messages, the backdrop, badges and 7TV visibility.", "02");
 
-    backgroundColorInput.type =
-        "color";
+    const backgroundCheckbox = addToggle(appearancePanel, "Background", "Use the configured overlay backdrop.", "background", backgroundEnabled);
 
-    backgroundColorInput.value =
-        backgroundColor;
+    const backgroundColorRow = document.createElement("div");
+    backgroundColorRow.className = "mc-color-row";
 
-    backgroundColorInput.style.cssText = `
-        box-sizing: border-box;
-        -webkit-appearance: none;
-        appearance: none;
+    const backgroundColorText = document.createElement("span");
+    backgroundColorText.className = "mc-muted";
+    backgroundColorText.textContent = backgroundColor;
 
-        width: 40px;
-        height: 20px;
+    const backgroundColorInput = document.createElement("input");
+    backgroundColorInput.type = "color";
+    backgroundColorInput.className = "mc-color";
+    backgroundColorInput.value = backgroundColor;
+    backgroundColorInput.setAttribute("aria-label", "Background color");
 
-        padding: 0;
-        border: 1px solid #46464f;
-        border-radius: 4px;
+    backgroundColorRow.appendChild(backgroundColorText);
+    backgroundColorRow.appendChild(backgroundColorInput);
+    appearancePanel.appendChild(backgroundColorRow);
 
-        background: transparent;
+    const wrapCheckbox = addToggle(appearancePanel, "Wrap messages", "Allow long chat messages to continue on another line.", "wrap", wrapEnabled);
+    const badgesCheckbox = addToggle(appearancePanel, "Badges", "Show Twitch, 7TV, FFZ and other supported badges.", "badges", badgesEnabled);
+    const unlistedCheckbox = addToggle(appearancePanel, "Unlisted 7TV emotes", "Render unlisted 7TV emotes when they are available.", "unlisted", showUnlisted7TV);
 
-        cursor: pointer;
-    `;
+    const typographyPanel = createPanel("typography", "Typography", "Choose the font used by the renderer. Changes are applied to the live preview immediately.", "03");
 
-    const colorSwatchFix =
-        document.createElement("style");
-
-    colorSwatchFix.textContent = `
-        input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
-        input[type="color"]::-webkit-color-swatch {
-            border: none;
-            border-radius: 3px;
-        }
-        input[type="color"]::-moz-color-swatch {
-            border: none;
-            border-radius: 3px;
-        }
-    `;
-
-    document.head.appendChild(colorSwatchFix);
-
-    function handleBackgroundColorChange() {
-        backgroundColor =
-            backgroundColorInput.value;
-
-        applyBackgroundColor(
-            backgroundColor
-        );
-        if (!backgroundCheckbox.checked) {
-            backgroundCheckbox.checked = true;
-            backgroundCheckbox.dispatchEvent(new Event("change"));
-        }
-    }
-
-    backgroundColorInput.addEventListener(
-        "input",
-        handleBackgroundColorChange
-    );
-
-    backgroundColorInput.addEventListener(
-        "change",
-        handleBackgroundColorChange
-    );
-
-    backgroundColorRow.appendChild(
-        backgroundColorLabel
-    );
-
-    backgroundColorRow.appendChild(
-        backgroundColorInput
-    );
-
-    settings.appendChild(
-        backgroundColorRow
-    );
-
-    const wrapCheckbox =
-        createToggle(
-            "Wrap messages",
-            "wrap",
-            wrapEnabled
-        );
-
-    const badgesCheckbox =
-        createToggle(
-            "Badges",
-            "badges",
-            badgesEnabled
-        );
-
-    const unlistedCheckbox =
-        createToggle(
-            "Unlisted 7TV emotes",
-            "unlisted",
-            showUnlisted7TV
-        );
-
-    const fontSectionTitle =
-        document.createElement("div");
-
-    fontSectionTitle.textContent =
-        "Font";
-
-    fontSectionTitle.style.cssText = `
-        margin-top: 17px;
-        margin-bottom: 9px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #e2e2e8;
-    `;
-
-    const fontLabel =
-        document.createElement("label");
-
-    fontLabel.textContent =
-        "Chat Font";
-
-    fontLabel.style.cssText = `
-        display: block;
-        margin-bottom: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #e2e2e8;
-    `;
-
-    const fontSelect =
-        document.createElement("select");
-
-    fontSelect.style.cssText = `
-        width: 100%;
-        height: 32px;
-        box-sizing: border-box;
-        padding: 0 10px;
-        border: 1px solid #46464f;
-        border-radius: 6px;
-        background: #151518;
-        color: #ffffff;
-        outline: none;
-        font-size: 12px;
-        cursor: pointer;
-    `;
+    const fontSelect = document.createElement("select");
+    fontSelect.className = "mc-select";
 
     for (const font of CHAT_FONTS) {
-        const option =
-            document.createElement("option");
-
+        const option = document.createElement("option");
         option.value = font.value;
         option.textContent = font.label;
-
         if (font.value === chatFont) {
             option.selected = true;
         }
-
         fontSelect.appendChild(option);
     }
 
-    fontSelect.addEventListener("change", () => {
-        chatFont = fontSelect.value;
+    addField(typographyPanel, "Chat font", fontSelect);
 
-        document.documentElement.style.setProperty("--chat-font", chatFont);
+    const typographyNote = document.createElement("div");
+    typographyNote.className = "mc-muted";
+    typographyNote.textContent = "The same font setting is serialized into the generated overlay URL.";
+    typographyPanel.appendChild(typographyNote);
 
-        loadGoogleFontIfNeeded(chatFont);   
-        loadCustomFontIfNeeded(chatFont);
+    const textScaleInput = document.createElement("input");
+    textScaleInput.type = "number";
+    textScaleInput.className = "mc-input";
+    textScaleInput.min = "0.25";
+    textScaleInput.max = "3";
+    textScaleInput.step = "0.05";
+    textScaleInput.value = String(scale);
 
-        document.body.classList.toggle(
-            "pixel-font",
-            chatFont === "'Minecraft', sans-serif"
-        );
-    });
+    addField(typographyPanel, "Text scale", textScaleInput);
 
-    const animationTitle =
-        document.createElement("div");
+    const timingPanel = createPanel("timing", "Timing", "Tune message lifetime and fading behavior.", "04");
 
-    animationTitle.textContent =
-        "Animation & Scaling";
+    const timingTwoCol = document.createElement("div");
+    timingTwoCol.className = "mc-two-col";
 
-    animationTitle.style.cssText = `
-        margin-top: 17px;
-        margin-bottom: 9px;
+    const fadeField = document.createElement("div");
+    fadeField.className = "mc-field";
 
-        font-size: 12px;
-        font-weight: 600;
+    const fadeLabel = document.createElement("label");
+    fadeLabel.className = "mc-label";
+    fadeLabel.textContent = "Fade time";
 
-        color: #e2e2e8;
-    `;
+    const fadeLine = document.createElement("div");
+    fadeLine.className = "mc-range-line";
 
-    const fadeLabel =
-        document.createElement("label");
+    const fadeInput = document.createElement("input");
+    fadeInput.type = "number";
+    fadeInput.className = "mc-input";
+    fadeInput.min = "1";
+    fadeInput.max = "300";
+    fadeInput.step = "1";
+    fadeInput.value = fade === false ? "" : String(fade);
+    fadeInput.placeholder = "15";
 
-    fadeLabel.textContent =
-        "Fade time";
+    const fadeUnit = document.createElement("span");
+    fadeUnit.className = "mc-unit";
+    fadeUnit.textContent = "sec";
 
-    fadeLabel.style.cssText = `
-        display: block;
+    fadeLine.appendChild(fadeInput);
+    fadeLine.appendChild(fadeUnit);
+    fadeField.appendChild(fadeLabel);
+    fadeField.appendChild(fadeLine);
 
-        margin-bottom: 6px;
+    timingTwoCol.appendChild(fadeField);
+    timingPanel.appendChild(timingTwoCol);
 
-        font-size: 12px;
-        font-weight: 600;
+    const noFade = addToggle(timingPanel, "Disable fading", "Keep messages visible until the renderer removes them.", "disable-fading", fade === false);
 
-        color: #e2e2e8;
-    `;
+    const actions = document.createElement("div");
+    actions.className = "mc-actions";
 
-    const fadeInput =
-        document.createElement("input");
+    const authorizeButton = document.createElement("button");
+    authorizeButton.type = "button";
+    authorizeButton.className = "mc-button mc-button-primary";
+    authorizeButton.textContent = accessToken ? "Twitch authorized" : "Authorize Twitch";
 
-    fadeInput.type =
-        "number";
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "mc-button";
+    copyButton.textContent = "Copy overlay link";
 
-    fadeInput.min =
-        "1";
+    actions.appendChild(authorizeButton);
+    actions.appendChild(copyButton);
 
-    fadeInput.max =
-        "300";
+    const error = document.createElement("div");
+    error.className = "mc-error";
 
-    fadeInput.step =
-        "1";
+    connectionPanel.appendChild(actions);
+    connectionPanel.appendChild(error);
 
-    fadeInput.value =
-        fade === false
-            ? ""
-            : String(fade);
-
-    fadeInput.placeholder =
-        "15";
-
-    fadeInput.style.cssText = `
-        width: 100%;
-        height: 32px;
-
-        box-sizing: border-box;
-
-        padding: 0 10px;
-
-        border:
-            1px solid #46464f;
-
-        border-radius: 6px;
-
-        background: #151518;
-
-        color: #ffffff;
-
-        outline: none;
-
-        font-size: 12px;
-    `;
-
-    const fadeNoWrapper =
-        document.createElement("div");
-
-    fadeNoWrapper.style.cssText = `
-        margin-top: 8px;
-        margin-bottom: 17px;
-    `;
-
-    const noFade =
-        createToggle(
-            "Disable fading",
-            "disable-fading",
-            fade === false
-        );
-
-    settings.removeChild(
-        noFade.parentElement
-    );
-
-    fadeNoWrapper.appendChild(
-        noFade.parentElement
-    );
-
-    noFade.addEventListener(
-        "change",
-        () => {
-            fadeInput.disabled =
-                noFade.checked;
-
-            fadeInput.style.opacity =
-                noFade.checked
-                    ? ".4"
-                    : "1";
+    function activatePanel(id) {
+        const button = nav.querySelector(`.mc-nav-button[data-panel="${id}"]`);
+        if (button) {
+            button.click();
         }
-    );
-
-    fadeInput.disabled =
-        noFade.checked;
-
-    if (noFade.checked) {
-        fadeInput.style.opacity =
-            ".4";
     }
 
-    const scaleLabel =
-        document.createElement("label");
+    activatePanel("connection");
 
-    scaleLabel.textContent =
-        "Scale";
+    function syncFadeState() {
+        fadeInput.disabled = noFade.checked;
+        fadeInput.style.opacity = noFade.checked ? ".45" : "1";
+        fadeInput.title = noFade.checked ? "Disable fading is enabled" : "Fade time in seconds";
+    }
 
-    scaleLabel.style.cssText = `
-        display: block;
+    function applyBackgroundPreview() {
+        backgroundColor = backgroundColorInput.value;
+        backgroundColorText.textContent = backgroundColor;
+        applyBackgroundColor(backgroundColor);
+        backgroundEnabled = backgroundCheckbox.checked;
+        document.body.classList.toggle("has-background", backgroundEnabled);
+        previewChat.classList.toggle("has-background", backgroundEnabled);
+    }
 
-        margin-bottom: 6px;
+    backgroundCheckbox.addEventListener("change", applyBackgroundPreview);
+    backgroundColorInput.addEventListener("input", applyBackgroundPreview);
+    backgroundColorInput.addEventListener("change", applyBackgroundPreview);
 
-        font-size: 12px;
-        font-weight: 600;
+    wrapCheckbox.addEventListener("change", () => {
+        wrapEnabled = wrapCheckbox.checked;
+    });
 
-        color: #e2e2e8;
-    `;
+    badgesCheckbox.addEventListener("change", () => {
+        badgesEnabled = badgesCheckbox.checked;
+    });
 
-    const scaleInput =
-        document.createElement("input");
+    unlistedCheckbox.addEventListener("change", () => {
+        showUnlisted7TV = unlistedCheckbox.checked;
+    });
 
-    scaleInput.type =
-        "number";
+    fontSelect.addEventListener("change", () => {
+        chatFont = fontSelect.value;
+        document.documentElement.style.setProperty("--chat-font", chatFont);
+        loadGoogleFontIfNeeded(chatFont);
+        loadCustomFontIfNeeded(chatFont);
+        document.body.classList.toggle("pixel-font", chatFont === "'Minecraft', sans-serif");
+    });
 
-    scaleInput.min =
-        "0.25";
-
-    scaleInput.max =
-        "3";
-
-    scaleInput.step =
-        "0.05";
-
-    scaleInput.value =
-        String(scale);
-
-    scaleInput.style.cssText = `
-        width: 100%;
-        height: 32px;
-
-        box-sizing: border-box;
-
-        padding: 0 10px;
-
-        border:
-            1px solid #46464f;
-
-        border-radius: 6px;
-
-        background: #151518;
-
-        color: #ffffff;
-
-        outline: none;
-
-        font-size: 12px;
-    `;
-
-
-        backgroundCheckbox.addEventListener(
-        "change",
-        () => {
-            backgroundEnabled =
-                backgroundCheckbox.checked;
-
-            document.body.classList.toggle(
-                "has-background",
-                backgroundEnabled
-            );
-
-            previewChat.classList.toggle(
-                "has-background",
-                backgroundEnabled
-            );
+    fadeInput.addEventListener("input", () => {
+        if (!noFade.checked) {
+            fade = Math.max(1, Number(fadeInput.value) || 15);
         }
-    );
+    });
 
-    wrapCheckbox.addEventListener(
-        "change",
-        () => {
-            wrapEnabled =
-                wrapCheckbox.checked;
+    noFade.addEventListener("change", () => {
+        fade = noFade.checked ? false : Math.max(1, Number(fadeInput.value) || 15);
+        syncFadeState();
+    });
+
+    textScaleInput.addEventListener("input", () => {
+        const newScale = Number(textScaleInput.value);
+        if (!Number.isFinite(newScale)) {
+            return;
         }
-    );
+        scale = Math.max(0.25, Math.min(newScale, 3));
+        document.documentElement.style.setProperty("--chat-scale", scale);
+    });
 
-    badgesCheckbox.addEventListener(
-        "change",
-        () => {
-            badgesEnabled =
-                badgesCheckbox.checked;
+    channelInput.addEventListener("input", () => {
+        error.style.display = "none";
+    });
+
+    channelInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            copyButton.click();
         }
-    );
-
-    unlistedCheckbox.addEventListener(
-        "change",
-        () => {
-            showUnlisted7TV =
-                unlistedCheckbox.checked;
-        }
-    );
-
-    fadeInput.addEventListener(
-        "input",
-        () => {
-            if (!noFade.checked) {
-                fade =
-                    Math.max(
-                        1,
-                        Number(fadeInput.value) || 15
-                    );
-            }
-        }
-    );
-
-    noFade.addEventListener(
-        "change",
-        () => {
-            fade =
-                noFade.checked
-                    ? false
-                    : Math.max(
-                        1,
-                        Number(fadeInput.value) || 15
-                    );
-        }
-    );
-
-    scaleInput.addEventListener(
-        "input",
-        () => {
-            let newScale =
-                Number(scaleInput.value);
-
-            if (!Number.isFinite(newScale)) {
-                return;
-            }
-
-            scale =
-                Math.max(
-                    0.25,
-                    Math.min(newScale, 3)
-                );
-
-            document.documentElement.style.setProperty(
-                "--chat-scale",
-                scale
-            );
-        }
-    );
-
-    channelInput.addEventListener(
-        "focus",
-        () => {
-            channelInput.style.borderColor =
-                "#9147ff";
-        }
-    );
-
-    channelInput.addEventListener(
-        "blur",
-        () => {
-            channelInput.style.borderColor =
-                "#46464f";
-        }
-    );
-
-    const error =
-        document.createElement("div");
-
-    error.dataset.channelError =
-        "true";
-
-    error.style.cssText = `
-        display: none;
-
-        margin-top: 10px;
-        padding: 8px 10px;
-
-        background:
-            rgba(239, 68, 68, .12);
-
-        border:
-            1px solid rgba(239, 68, 68, .4);
-
-        border-radius: 6px;
-
-        color: #ff8c8c;
-
-        font-size: 11px;
-    `;
+    });
 
     function getOverlayUrl() {
-        const channel =
-            channelInput.value
-                .trim()
-                .toLowerCase()
-                .replace(/^#/, "");
+        const channel = channelInput.value.trim().toLowerCase().replace(/^#/, "");
 
         if (!channel) {
-            error.textContent =
-                "Enter a Twitch channel.";
-
-            error.style.display =
-                "block";
-
+            error.textContent = "Enter a Twitch channel before generating the overlay link.";
+            error.style.display = "block";
+            activatePanel("connection");
+            channelInput.focus();
             return null;
         }
 
-        error.style.display =
-            "none";
+        error.style.display = "none";
 
         const overlaySettings = {
             background: backgroundCheckbox.checked,
             backgroundColor: backgroundColorInput.value,
             fade: noFade.checked ? false : Math.max(1, Number(fadeInput.value) || 15),
             badges: badgesCheckbox.checked,
-            scale: Math.max(0.25, Math.min(Number(scaleInput.value) || 1, 3)),
+            scale: Math.max(0.25, Math.min(Number(textScaleInput.value) || 1, 3)),
             wrap: wrapCheckbox.checked,
             unlisted: unlistedCheckbox.checked,
             font: fontSelect.value
         };
 
-        const encodedSettings =
-            btoa(
-                encodeURIComponent(
-                    JSON.stringify(
-                        overlaySettings
-                    )
-                )
-            )
-                .replace(/\+/g, "-")
-                .replace(/\//g, "_")
-                .replace(/=+$/, "");
+        const encodedSettings = btoa(
+            encodeURIComponent(JSON.stringify(overlaySettings))
+        )
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_")
+            .replace(/=+$/, "");
 
-        const url =
-            new URL(
-                window.location.href
-            );
-
+        const url = new URL(window.location.href);
         url.search = "";
-
-        url.searchParams.set(
-            "channel",
-            channel
-        );
-
-        url.searchParams.set(
-            "settings",
-            encodedSettings
-        );
+        url.searchParams.set("channel", channel);
+        url.searchParams.set("settings", encodedSettings);
 
         return url.toString();
     }
 
-    const authorizeButton =
-        document.createElement("button");
-
-    authorizeButton.type =
-        "button";
-
-    authorizeButton.textContent =
-        "Authorize Twitch";
-
-    authorizeButton.style.cssText = `
-        width: 100%;
-        height: 34px;
-
-        margin-top: 17px;
-
-        border: none;
-        border-radius: 5px;
-
-        background: #9147ff;
-
-        color: #ffffff;
-
-        font-size: 12px;
-        font-weight: 600;
-
-        cursor: pointer;
-
-        transition:
-            background .15s ease;
-    `;
-
-    authorizeButton.addEventListener(
-        "mouseenter",
-        () => {
-            authorizeButton.style.background =
-                "#772ce8";
+    authorizeButton.addEventListener("click", () => {
+        const url = getOverlayUrl();
+        if (!url) {
+            return;
         }
-    );
 
-    authorizeButton.addEventListener(
-        "mouseleave",
-        () => {
-            authorizeButton.style.background =
-                "#9147ff";
+        if (accessToken) {
+            statusPill.classList.add("is-connected");
+            statusText.textContent = "Authorized";
+            topStatusText.textContent = "Twitch connected";
+            topStatusDot.style.background = "#35c759";
+            authorizeButton.textContent = "Twitch authorized";
+            return;
         }
-    );
 
-    authorizeButton.addEventListener(
-        "click",
-        () => {
-            const url =
-                getOverlayUrl();
+        localStorage.setItem("twitch_overlay_pending_url", url);
+        startTwitchLogin();
+    });
 
-            if (!url) {
-                return;
-            }
-
-            if (accessToken) {
-                authorizeButton.textContent =
-                    "Twitch Authorized";
-
-                return;
-            }
-
-            localStorage.setItem(
-                "twitch_overlay_pending_url",
-                url
-            );
-
-            startTwitchLogin();
+    copyButton.addEventListener("click", async () => {
+        const url = getOverlayUrl();
+        if (!url) {
+            return;
         }
-    );
 
-    const copyButton =
-        document.createElement("button");
-
-    copyButton.type =
-        "button";
-
-    copyButton.textContent =
-        "Copy Overlay Link";
-
-    copyButton.style.cssText = `
-        width: 100%;
-        height: 34px;
-
-        margin-top: 8px;
-
-        border:
-            1px solid #55555f;
-
-        border-radius: 5px;
-
-        background: #2b2b31;
-
-        color: #ffffff;
-
-        font-size: 12px;
-        font-weight: 600;
-
-        cursor: pointer;
-
-        transition:
-            background .15s ease,
-            border-color .15s ease;
-    `;
-
-    copyButton.addEventListener(
-        "mouseenter",
-        () => {
-            copyButton.style.background =
-                "#35353d";
-
-            copyButton.style.borderColor =
-                "#777783";
+        try {
+            await navigator.clipboard.writeText(url);
+        } catch {
+            const textarea = document.createElement("textarea");
+            textarea.value = url;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            textarea.remove();
         }
-    );
 
-    copyButton.addEventListener(
-        "mouseleave",
-        () => {
-            copyButton.style.background =
-                "#2b2b31";
+        copyButton.textContent = "Link copied";
+        window.setTimeout(() => {
+            copyButton.textContent = "Copy overlay link";
+        }, 1500);
+    });
 
-            copyButton.style.borderColor =
-                "#55555f";
-        }
-    );
+    syncFadeState();
+    loadPreviewEmotes();
 
-    copyButton.addEventListener(
-        "click",
-        async () => {
-            const url =
-                getOverlayUrl();
-
-            if (!url) {
-                return;
-            }
-
-            try {
-                await navigator.clipboard.writeText(
-                    url
-                );
-
-                copyButton.textContent =
-                    "Copied!";
-
-                setTimeout(
-                    () => {
-                        copyButton.textContent =
-                            "Copy Overlay Link";
-                    },
-                    1500
-                );
-            } catch {
-                const textarea =
-                    document.createElement(
-                        "textarea"
-                    );
-
-                textarea.value =
-                    url;
-
-                textarea.style.position =
-                    "fixed";
-
-                textarea.style.opacity =
-                    "0";
-
-                document.body.appendChild(
-                    textarea
-                );
-
-                textarea.select();
-
-                document.execCommand(
-                    "copy"
-                );
-
-                textarea.remove();
-
-                copyButton.textContent =
-                    "Copied!";
-
-                setTimeout(
-                    () => {
-                        copyButton.textContent =
-                            "Copy Overlay Link";
-                    },
-                    1500
-                );
-            }
-        }
-    );
-
-    const footer =
-        document.createElement("div");
-
-    footer.textContent =
-        "Authorize Twitch to connect your account, or copy the overlay link for OBS.";
-
-    footer.style.cssText = `
-        margin-top: 9px;
-
-        color: #858590;
-
-        font-size: 10px;
-        line-height: 1.45;
-    `;
-
-    sidebar.appendChild(
-        title
-    );
-
-    sidebar.appendChild(
-        description
-    );
-
-    sidebar.appendChild(
-        channelLabel
-    );
-
-    sidebar.appendChild(
-        channelInput
-    );
-
-    sidebar.appendChild(
-        settingsTitle
-    );
-
-    sidebar.appendChild(
-        settings
-    );
-
-    sidebar.appendChild(fontSectionTitle);
-    sidebar.appendChild(fontLabel);
-    sidebar.appendChild(fontSelect);
-
-    sidebar.appendChild(
-        animationTitle
-    );
-
-    sidebar.appendChild(
-        fadeLabel
-    );
-
-    sidebar.appendChild(
-        fadeInput
-    );
-
-    sidebar.appendChild(
-        fadeNoWrapper
-    );
-
-    sidebar.appendChild(
-        scaleLabel
-    );
-
-    sidebar.appendChild(
-        scaleInput
-    );
-
-    sidebar.appendChild(
-        error
-    );
-
-    sidebar.appendChild(
-        authorizeButton
-    );
-
-    sidebar.appendChild(
-        copyButton
-    );
-
-    sidebar.appendChild(
-        footer
-    );
-
-    screen.appendChild(
-        sidebar
-    );
-
-    screen.appendChild(
-        preview
-    );
-
-    document.body.appendChild(
-        screen
-    );
-    setTimeout(() => {
+    window.setTimeout(() => {
         runPreviewMessage();
     }, 3000);
 }
-
-
 
 function showChannelError(message) {
     const screen =
