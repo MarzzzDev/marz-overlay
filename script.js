@@ -1769,34 +1769,6 @@ function showTwitchLoginScreen() {
             align-items: center;
         }
 
-        #twitch-login-screen .mc-status-pill {
-            height: 34px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 0 10px;
-            border: 1px solid #32323a;
-            border-radius: 5px;
-            background: #0a0a0d;
-            color: #6d6d77;
-            font-size: 8px;
-            white-space: nowrap;
-        }
-
-        #twitch-login-screen .mc-status-pill .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #3d3d45;
-        }
-
-        #twitch-login-screen .mc-status-pill.is-connected {
-            color: #9cdeb0;
-        }
-
-        #twitch-login-screen .mc-status-pill.is-connected .dot {
-            background: #35c759;
-        }
 
         #twitch-login-screen .mc-divider {
             height: 1px;
@@ -1967,14 +1939,14 @@ function showTwitchLoginScreen() {
         }
 
         #twitch-login-screen .mc-button-primary {
-            border-color: #e8d58a;
-            background: #e8d58a;
+            border-color: #9147ff;
+            background: #9147ff;
             color: #fff;
         }
 
         #twitch-login-screen .mc-button-primary:hover {
-            background: #d2be70;
-            border-color: #d2be70;
+            background: #7f35e7;
+            border-color: #7f35e7;
         }
 
         #twitch-login-screen .mc-button-full {
@@ -2537,16 +2509,6 @@ function showTwitchLoginScreen() {
     channelInline.className = "mc-inline";
     channelInline.appendChild(channelInput);
 
-    const statusPill = document.createElement("div");
-    statusPill.className = `mc-status-pill${accessToken ? " is-connected" : ""}`;
-    const statusDot = document.createElement("span");
-    statusDot.className = "dot";
-    const statusText = document.createElement("span");
-    statusText.textContent = accessToken ? "Authorized" : "Not authorized";
-    statusPill.appendChild(statusDot);
-    statusPill.appendChild(statusText);
-
-    channelInline.appendChild(statusPill);
     addField(connectionPanel, "Twitch channel", channelInline);
 
     const connectionDivider = document.createElement("div");
@@ -2806,10 +2768,6 @@ function showTwitchLoginScreen() {
         }
 
         if (accessToken) {
-            statusPill.classList.add("is-connected");
-            statusText.textContent = "Authorized";
-            topStatusText.textContent = "Twitch connected";
-            topStatusDot.style.background = "#35c759";
             authorizeButton.textContent = "Twitch authorized";
             return;
         }
